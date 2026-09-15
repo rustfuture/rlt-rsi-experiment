@@ -2,7 +2,15 @@ import json
 import pytest
 import numpy as np
 
-from rlt_rsi.data import DatasetSplit, make_split, split_manifest
+from rlt_rsi.data import (
+    DatasetSplit,
+    count_overlap,
+    example_keys,
+    make_split,
+    make_splits,
+    select_rows,
+    split_manifest,
+)
 
 
 def test_generation_is_deterministic_and_parity_is_correct():
@@ -67,3 +75,46 @@ def test_invalid_parameters_raise_value_error():
 
     with pytest.raises(ValueError, match="0 < min_length <= max_length"):
         make_split(n=10, min_length=0, max_length=5, seed=1)
+
+
+def test_example_keys_are_padding_independent_and_unique_by_construction():
+    split = make_split(n=64, min_length=4, max_length=8, seed=5)
+    keys = example_keys(split)
+    assert len(keys) == 64, "rejection sampling must produce 64 distinct examples"
+    subset = select_rows(split, np.arange(8), seed=99)
+    assert example_keys(subset) <= keys
+
+
+def test_count_overlap_counts_exact_shared_examples():
+    a = make_split(n=64, min_length=4, max_length=8, seed=1)
+    b = select_rows(a, np.arange(0, 64, 2), seed=2)
+    assert count_overlap(a, b) == 32
+    assert count_overlap(a, a) == 64
+
+
+def test_experiment_splits_are_example_disjoint_for_every_documented_seed():
+    """train/dev/held-out must share zero exact examples (same length + same tokens)."""
+    for seed in (7, 42, 123):
+        splits = make_splits(train_n=256, dev_n=128, heldout_n=128, seed=seed)
+        assert count_overlap(splits["train"], splits["dev"]) == 0, f"seed {seed}: train/dev overlap"
+        assert count_overlap(splits["train"], splits["heldout"]) == 0, f"seed {seed}: train/held-out overlap"
+        assert count_overlap(splits["dev"], splits["heldout"]) == 0, f"seed {seed}: dev/held-out overlap"
+        assert len(example_keys(splits["train"])) == 256
+        assert len(example_keys(splits["dev"])) == 128
+
+
+def test_joint_pool_keeps_short_lengths_in_both_train_and_dev():
+    """Drawing train first would exhaust the 2**4=16 length-4 examples; the joint pool avoids that."""
+    splits = make_splits(train_n=256, dev_n=128, heldout_n=128, seed=7)
+    train_lengths = set(splits["train"].lengths.tolist())
+    dev_lengths = set(splits["dev"].lengths.tolist())
+    assert train_lengths == {4, 5, 6, 7, 8}
+    assert dev_lengths == {4, 5, 6, 7, 8}
+
+
+def test_split_generation_fails_loudly_when_example_space_is_exhausted():
+    with pytest.raises(ValueError, match="example space is too small"):
+        make_split(n=1000, min_length=2, max_length=2, seed=1)
+
+    with pytest.raises(ValueError, match="example space is too small"):
+        make_splits(train_n=400, dev_n=200, heldout_n=8, seed=1)
