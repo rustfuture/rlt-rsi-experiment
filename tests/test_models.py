@@ -1,4 +1,7 @@
 import json
+import platform
+import sys
+
 import pytest
 import numpy as np
 
@@ -35,35 +38,58 @@ def test_readout_smoke_is_finite():
     assert np.isfinite(result["final_train_bce"])
 
 
-def test_shared_weights_architecture_parameters_constant_and_block_calls_scale():
-    """Verify that architecture parameters remain strictly identical across loop counts (1, 2, 4)
-    while estimated_block_calls increases linearly with loop count."""
+def test_numpy_parameter_accounting_reports_total_trainable_and_frozen():
     cfg = NumpyConfig(d_model=24, n_heads=4, d_ff=48, seed=7)
-    baseline = NumpyTransformerClassifier(cfg)
-    looped_1 = NumpyLoopedTransformerClassifier(cfg, 1)
-    looped_2 = NumpyLoopedTransformerClassifier(cfg, 2)
-    looped_4 = NumpyLoopedTransformerClassifier(cfg, 4)
+    model = NumpyTransformerClassifier(cfg)
+    counts = model.parameter_counts()
 
-    # All architectures must share the exact same parameter count
-    p_base = baseline.architecture_parameters()
-    p_l1 = looped_1.architecture_parameters()
-    p_l2 = looped_2.architecture_parameters()
-    p_l4 = looped_4.architecture_parameters()
+    # The transformer + embedding subtotal is 4,656; it is NOT the total because the
+    # trainable readout (d_model) and bias (1) are separate parameters.
+    assert counts["frozen"] == 4656
+    assert counts["trainable"] == cfg.d_model + 1 == 25
+    assert counts["total"] == 4681
+    assert counts["total"] == counts["trainable"] + counts["frozen"]
 
-    assert p_base == 4656
-    assert p_l1 == p_base
-    assert p_l2 == p_base
-    assert p_l4 == p_base
+    # architecture_parameters() is the documented frozen-backbone subtotal only.
+    assert model.architecture_parameters() == counts["frozen"]
+    assert model.architecture_parameters() != counts["total"]
 
-    # Block calls scale linearly with loop count
-    assert baseline.estimated_block_calls == 1
-    assert looped_1.estimated_block_calls == 1
-    assert looped_2.estimated_block_calls == 2
-    assert looped_4.estimated_block_calls == 4
 
-    # Invalid loop count raises ValueError
+def test_parameter_counts_constant_across_loop_counts_and_block_calls_scale():
+    """Architecture parameter counts stay constant across loops; block applications scale 1/1/2/4."""
+    cfg = NumpyConfig(d_model=24, n_heads=4, d_ff=48, seed=7)
+    models = [
+        NumpyTransformerClassifier(cfg),
+        NumpyLoopedTransformerClassifier(cfg, 1),
+        NumpyLoopedTransformerClassifier(cfg, 2),
+        NumpyLoopedTransformerClassifier(cfg, 4),
+    ]
+
+    first = models[0].parameter_counts()
+    for model in models:
+        assert model.parameter_counts() == first
+    assert first == {"total": 4681, "trainable": 25, "frozen": 4656}
+
+    assert [m.estimated_block_calls for m in models] == [1, 1, 2, 4]
+    # estimated_block_calls is a structural counter, not FLOPs or latency.
+    block_call_doc = NumpyTransformerClassifier.estimated_block_calls.__doc__ or ""
+    assert "structural counter" in block_call_doc
+    assert "FLOP" in block_call_doc and "latency" in block_call_doc
+
     with pytest.raises(ValueError, match="loop_count must be >= 1"):
         NumpyLoopedTransformerClassifier(cfg, 0)
+
+
+def test_baseline_and_looped_start_from_identical_shared_parameters_for_a_seed():
+    cfg = NumpyConfig(d_model=24, n_heads=4, d_ff=48, seed=42)
+    baseline = NumpyTransformerClassifier(cfg)
+    for loops in (1, 2, 4):
+        looped = NumpyLoopedTransformerClassifier(cfg, loops)
+        np.testing.assert_array_equal(baseline.embedding, looped.embedding)
+        for name in ("wq", "wk", "wv", "wo", "w1", "w2"):
+            np.testing.assert_array_equal(getattr(baseline.block, name), getattr(looped.block, name))
+        np.testing.assert_array_equal(baseline.readout, looped.readout)
+        assert baseline.bias == looped.bias
 
 
 def test_determinism_and_reproducibility():
@@ -93,20 +119,22 @@ def test_determinism_and_reproducibility():
     assert ev1["bce"] == ev2["bce"]
 
 
-def test_torch_backend_unavailable_raises_runtime_error():
-    """Verify that attempting to invoke PyTorch backend when torch is absent raises a descriptive RuntimeError."""
+def test_torch_missing_error_is_dynamic_and_has_no_stale_version_claims(monkeypatch):
+    """The import error must name the *actual* python version, not a hardcoded environment."""
+    monkeypatch.setitem(sys.modules, "torch", None)
     with pytest.raises(RuntimeError) as exc_info:
         _torch_components()
 
     msg = str(exc_info.value)
-    assert "PyTorch backend requested" in msg
-    assert "PyTorch is not installed" in msg
-    assert "Python 3.14" in msg
-    assert "Colab Pro / NVIDIA L4" in msg
+    assert "PyTorch is not importable" in msg
+    assert platform.python_version() in msg
+    assert "3.14" not in msg.replace(platform.python_version(), "")
+    assert "colab" not in msg.lower()
+    assert "nvidia" not in msg.lower()
 
 
 def test_multi_seed_cli_runner(tmp_path):
-    """Test CLI runner with multi-seed flag end-to-end on temporary output paths."""
+    """CLI runner writes a payload and a report derived from the payload."""
     out_json = tmp_path / "test_run.json"
     out_md = tmp_path / "test_run.md"
 
@@ -130,6 +158,16 @@ def test_multi_seed_cli_runner(tmp_path):
     assert data["seeds"] == [7, 42]
     assert len(data["results"]) == 4  # baseline-1, looped-1, looped-2, looped-4
 
+    counts = data["results"][0]["parameter_counts"]
+    assert counts["total"] == counts["trainable"] + counts["frozen"]
+
+    overlap = data["data"]["example_overlap_by_seed"]
+    assert overlap and all(v == 0 for per_seed in overlap.values() for v in per_seed.values())
+
     md_content = out_md.read_text(encoding="utf-8")
     assert "baseline (reference)" in md_content
-    assert "4,656" in md_content
+    assert f"{counts['total']:,}" in md_content
+    assert "| H1 |" in md_content
+    assert "evaluated" in md_content
+    assert "does **not** establish preregistration" in md_content
+    assert "preregistered" not in md_content.lower()

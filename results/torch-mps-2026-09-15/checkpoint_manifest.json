@@ -1,0 +1,1266 @@
+{
+  "data": {
+    "dev_size": 128,
+    "example_overlap_by_seed": {
+      "123": {
+        "dev_heldout": 0,
+        "train_dev": 0,
+        "train_heldout": 0
+      },
+      "42": {
+        "dev_heldout": 0,
+        "train_dev": 0,
+        "train_heldout": 0
+      },
+      "7": {
+        "dev_heldout": 0,
+        "train_dev": 0,
+        "train_heldout": 0
+      }
+    },
+    "generator": "rejection-sampled, example-disjoint by construction (rlt_rsi/data.py); overlap is measured and recorded per seed and asserted to be zero",
+    "heldout_lengths": [
+      12,
+      16
+    ],
+    "heldout_size": 128,
+    "split_manifests_by_seed": {
+      "123": {
+        "dev": {
+          "fingerprint": "a7f47befbebdcf0c56ef6ba07c51fe177aedcbca010d02c3ef2d8496b7b17a05",
+          "length_counts": {
+            "4": 5,
+            "5": 9,
+            "6": 22,
+            "7": 38,
+            "8": 54
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 128,
+          "seed": 325
+        },
+        "heldout": {
+          "fingerprint": "1ba5bfae881d3fbe8cd3f4be1a084abbcd0b30ea23a479db193b412cc578f210",
+          "length_counts": {
+            "12": 30,
+            "13": 27,
+            "14": 24,
+            "15": 21,
+            "16": 26
+          },
+          "max_length": 16,
+          "min_length": 12,
+          "n": 128,
+          "seed": 426
+        },
+        "train": {
+          "fingerprint": "f43b2e9a27ecae8ad37a013b513ceb4452c3ac5507ba0f792c48bffe6a7c6c73",
+          "length_counts": {
+            "4": 11,
+            "5": 23,
+            "6": 42,
+            "7": 70,
+            "8": 110
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 256,
+          "seed": 224
+        }
+      },
+      "42": {
+        "dev": {
+          "fingerprint": "11c3d8ebf5f97b85bd9b9f8a383c9145c7f43779061248a970fcb9a7cf135fb5",
+          "length_counts": {
+            "4": 6,
+            "5": 10,
+            "6": 19,
+            "7": 35,
+            "8": 58
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 128,
+          "seed": 244
+        },
+        "heldout": {
+          "fingerprint": "f62cb546c93f857ef05ea9041ddb6eed94e767ce3ee953b34584c50879d1e986",
+          "length_counts": {
+            "12": 28,
+            "13": 19,
+            "14": 27,
+            "15": 35,
+            "16": 19
+          },
+          "max_length": 16,
+          "min_length": 12,
+          "n": 128,
+          "seed": 345
+        },
+        "train": {
+          "fingerprint": "ba4904024fa72b705e0ce9f17fbd311cfe99ef9896cbef339ec5b1b61b2df732",
+          "length_counts": {
+            "4": 10,
+            "5": 22,
+            "6": 44,
+            "7": 75,
+            "8": 105
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 256,
+          "seed": 143
+        }
+      },
+      "7": {
+        "dev": {
+          "fingerprint": "ff68ade93249cfedb82fcfffa251ea48554ebd8bc18506de316bbf234ae49eb3",
+          "length_counts": {
+            "4": 5,
+            "5": 8,
+            "6": 28,
+            "7": 36,
+            "8": 51
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 128,
+          "seed": 209
+        },
+        "heldout": {
+          "fingerprint": "28f280508617caea480e4edafb8cc7a9d3f083913d17386bbd1c8f881451451b",
+          "length_counts": {
+            "12": 21,
+            "13": 26,
+            "14": 25,
+            "15": 26,
+            "16": 30
+          },
+          "max_length": 16,
+          "min_length": 12,
+          "n": 128,
+          "seed": 310
+        },
+        "train": {
+          "fingerprint": "f3b05b0c9212962445a0ab9bc7ab24fcfb4467f6eb41f9e1d0200f046b160595",
+          "length_counts": {
+            "4": 11,
+            "5": 24,
+            "6": 35,
+            "7": 76,
+            "8": 110
+          },
+          "max_length": 8,
+          "min_length": 4,
+          "n": 256,
+          "seed": 108
+        }
+      }
+    },
+    "train_lengths": [
+      4,
+      8
+    ],
+    "train_size": 256
+  },
+  "environment": {
+    "machine": "arm64",
+    "numpy": "2.5.3",
+    "platform": "macOS-26.6.2-arm64-arm-64bit",
+    "python": "3.12.13",
+    "torch": "2.14.0",
+    "torch_available": true
+  },
+  "files": [
+    {
+      "bytes": 25799,
+      "loop_count": 1,
+      "model": "baseline",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed7-baseline-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.5078125,
+          "accuracy_by_length": {
+            "4": 0.6,
+            "5": 0.5,
+            "6": 0.35714285714285715,
+            "7": 0.5277777777777778,
+            "8": 0.5686274509803921
+          },
+          "bce": 0.6893185776425526,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.5390625,
+          "accuracy_by_length": {
+            "12": 0.47619047619047616,
+            "13": 0.5,
+            "14": 0.52,
+            "15": 0.5,
+            "16": 0.6666666666666666
+          },
+          "bce": 0.6927916067652404,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.58984375,
+          "accuracy_by_length": {
+            "4": 0.7272727272727273,
+            "5": 0.5,
+            "6": 0.34285714285714286,
+            "7": 0.5394736842105263,
+            "8": 0.7090909090909091
+          },
+          "bce": 0.6822481811395846,
+          "n": 256
+        }
+      },
+      "seed": 7,
+      "sha256": "be16b0b495325cae6f8df2f57aed7fb008b5022fcb87614a7910c311b00e93ea"
+    },
+    {
+      "bytes": 25757,
+      "loop_count": 1,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed7-looped-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.5078125,
+          "accuracy_by_length": {
+            "4": 0.6,
+            "5": 0.5,
+            "6": 0.35714285714285715,
+            "7": 0.5277777777777778,
+            "8": 0.5686274509803921
+          },
+          "bce": 0.6893185516819358,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.5390625,
+          "accuracy_by_length": {
+            "12": 0.47619047619047616,
+            "13": 0.5,
+            "14": 0.52,
+            "15": 0.5,
+            "16": 0.6666666666666666
+          },
+          "bce": 0.6927916016429663,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.58984375,
+          "accuracy_by_length": {
+            "4": 0.7272727272727273,
+            "5": 0.5,
+            "6": 0.34285714285714286,
+            "7": 0.5394736842105263,
+            "8": 0.7090909090909091
+          },
+          "bce": 0.6822481760173105,
+          "n": 256
+        }
+      },
+      "seed": 7,
+      "sha256": "469c0ce0703e097e21df8553b1d5caf8f3e87fade9e22ef237998a17fb6d1cc3"
+    },
+    {
+      "bytes": 25757,
+      "loop_count": 2,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed7-looped-loop2.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.453125,
+          "accuracy_by_length": {
+            "4": 0.4,
+            "5": 0.25,
+            "6": 0.5357142857142857,
+            "7": 0.5277777777777778,
+            "8": 0.39215686274509803
+          },
+          "bce": 0.6967718931846321,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.4921875,
+          "accuracy_by_length": {
+            "12": 0.2857142857142857,
+            "13": 0.6923076923076923,
+            "14": 0.6,
+            "15": 0.38461538461538464,
+            "16": 0.4666666666666667
+          },
+          "bce": 0.6937369606457651,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.484375,
+          "accuracy_by_length": {
+            "4": 0.5454545454545454,
+            "5": 0.5,
+            "6": 0.4857142857142857,
+            "7": 0.5394736842105263,
+            "8": 0.43636363636363634
+          },
+          "bce": 0.6917141773737967,
+          "n": 256
+        }
+      },
+      "seed": 7,
+      "sha256": "1a770af9f542e0d3b8d1485792013142f1fcb52c6176198ffd0de647da6b62a5"
+    },
+    {
+      "bytes": 25757,
+      "loop_count": 4,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed7-looped-loop4.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4453125,
+          "accuracy_by_length": {
+            "4": 0.6,
+            "5": 0.25,
+            "6": 0.39285714285714285,
+            "7": 0.5277777777777778,
+            "8": 0.43137254901960786
+          },
+          "bce": 0.6968067707493901,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.5390625,
+          "accuracy_by_length": {
+            "12": 0.47619047619047616,
+            "13": 0.5,
+            "14": 0.44,
+            "15": 0.46153846153846156,
+            "16": 0.7666666666666667
+          },
+          "bce": 0.6920399898663163,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.54296875,
+          "accuracy_by_length": {
+            "4": 0.8181818181818182,
+            "5": 0.4583333333333333,
+            "6": 0.34285714285714286,
+            "7": 0.6052631578947368,
+            "8": 0.5545454545454546
+          },
+          "bce": 0.6916575175710022,
+          "n": 256
+        }
+      },
+      "seed": 7,
+      "sha256": "8878540ab0da22e596efc39754379bc5c2d3e56c62012551c644f4896638769b"
+    },
+    {
+      "bytes": 25820,
+      "loop_count": 1,
+      "model": "baseline",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed42-baseline-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4375,
+          "accuracy_by_length": {
+            "4": 0.5,
+            "5": 0.7,
+            "6": 0.42105263157894735,
+            "7": 0.5428571428571428,
+            "8": 0.3275862068965517
+          },
+          "bce": 0.7256935146870092,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.4765625,
+          "accuracy_by_length": {
+            "12": 0.5714285714285714,
+            "13": 0.3684210526315789,
+            "14": 0.5555555555555556,
+            "15": 0.45714285714285713,
+            "16": 0.3684210526315789
+          },
+          "bce": 0.7020854281727225,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.5546875,
+          "accuracy_by_length": {
+            "4": 0.4,
+            "5": 0.5454545454545454,
+            "6": 0.6363636363636364,
+            "7": 0.72,
+            "8": 0.41904761904761906
+          },
+          "bce": 0.6836032451246865,
+          "n": 256
+        }
+      },
+      "seed": 42,
+      "sha256": "d6b43dfe2b729675f6e3507e55e591de45795ff7570077629969f62136aca9e4"
+    },
+    {
+      "bytes": 25778,
+      "loop_count": 1,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed42-looped-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4375,
+          "accuracy_by_length": {
+            "4": 0.5,
+            "5": 0.7,
+            "6": 0.42105263157894735,
+            "7": 0.5428571428571428,
+            "8": 0.3275862068965517
+          },
+          "bce": 0.7256935202749446,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.4765625,
+          "accuracy_by_length": {
+            "12": 0.5714285714285714,
+            "13": 0.3684210526315789,
+            "14": 0.5555555555555556,
+            "15": 0.45714285714285713,
+            "16": 0.3684210526315789
+          },
+          "bce": 0.702085406286642,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.5546875,
+          "accuracy_by_length": {
+            "4": 0.4,
+            "5": 0.5454545454545454,
+            "6": 0.6363636363636364,
+            "7": 0.72,
+            "8": 0.41904761904761906
+          },
+          "bce": 0.6836032445426099,
+          "n": 256
+        }
+      },
+      "seed": 42,
+      "sha256": "25353ea0e2ffd6497a75c5bef29bf15b7f89d618ecba7c8577e0521d89394a0f"
+    },
+    {
+      "bytes": 25778,
+      "loop_count": 2,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed42-looped-loop2.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.3828125,
+          "accuracy_by_length": {
+            "4": 0.5,
+            "5": 0.7,
+            "6": 0.42105263157894735,
+            "7": 0.34285714285714286,
+            "8": 0.3275862068965517
+          },
+          "bce": 0.7154503364581615,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.4375,
+          "accuracy_by_length": {
+            "12": 0.5,
+            "13": 0.3684210526315789,
+            "14": 0.4444444444444444,
+            "15": 0.45714285714285713,
+            "16": 0.3684210526315789
+          },
+          "bce": 0.6997594393324107,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.4921875,
+          "accuracy_by_length": {
+            "4": 0.4,
+            "5": 0.5454545454545454,
+            "6": 0.6363636363636364,
+            "7": 0.5066666666666667,
+            "8": 0.41904761904761906
+          },
+          "bce": 0.6843994015362114,
+          "n": 256
+        }
+      },
+      "seed": 42,
+      "sha256": "6afd6c1514e4ca8aed90cec33aacc8fe8bc58dc2f564f6a322a4d23f7f497dfd"
+    },
+    {
+      "bytes": 25778,
+      "loop_count": 4,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed42-looped-loop4.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.53125,
+          "accuracy_by_length": {
+            "4": 0.0,
+            "5": 0.4,
+            "6": 0.42105263157894735,
+            "7": 0.6,
+            "8": 0.603448275862069
+          },
+          "bce": 0.6786401977296919,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.4765625,
+          "accuracy_by_length": {
+            "12": 0.4642857142857143,
+            "13": 0.15789473684210525,
+            "14": 0.7407407407407407,
+            "15": 0.5428571428571428,
+            "16": 0.3157894736842105
+          },
+          "bce": 0.7213682688307017,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.6015625,
+          "accuracy_by_length": {
+            "4": 0.1,
+            "5": 0.3181818181818182,
+            "6": 0.5454545454545454,
+            "7": 0.68,
+            "8": 0.6761904761904762
+          },
+          "bce": 0.66070239583496,
+          "n": 256
+        }
+      },
+      "seed": 42,
+      "sha256": "112d44375009c0e5541cbbd56425d8e891f80b1e24893f0eef3372923713c7fa"
+    },
+    {
+      "bytes": 25905,
+      "loop_count": 1,
+      "model": "baseline",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed123-baseline-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4453125,
+          "accuracy_by_length": {
+            "4": 0.8,
+            "5": 0.5555555555555556,
+            "6": 0.5,
+            "7": 0.39473684210526316,
+            "8": 0.4074074074074074
+          },
+          "bce": 0.7079910071915947,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.375,
+          "accuracy_by_length": {
+            "12": 0.4,
+            "13": 0.37037037037037035,
+            "14": 0.3333333333333333,
+            "15": 0.47619047619047616,
+            "16": 0.3076923076923077
+          },
+          "bce": 0.7108138045296073,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.51953125,
+          "accuracy_by_length": {
+            "4": 0.5454545454545454,
+            "5": 0.5652173913043478,
+            "6": 0.6190476190476191,
+            "7": 0.42857142857142855,
+            "8": 0.5272727272727272
+          },
+          "bce": 0.6757478072831873,
+          "n": 256
+        }
+      },
+      "seed": 123,
+      "sha256": "6ae24bf76d9da03c7e1cc5bae50d5bdf1cb8ddac2fb3e3c0fec378b410c5f56f"
+    },
+    {
+      "bytes": 25799,
+      "loop_count": 1,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed123-looped-loop1.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4453125,
+          "accuracy_by_length": {
+            "4": 0.8,
+            "5": 0.5555555555555556,
+            "6": 0.5,
+            "7": 0.39473684210526316,
+            "8": 0.4074074074074074
+          },
+          "bce": 0.7079914035857655,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.375,
+          "accuracy_by_length": {
+            "12": 0.4,
+            "13": 0.37037037037037035,
+            "14": 0.3333333333333333,
+            "15": 0.47619047619047616,
+            "16": 0.3076923076923077
+          },
+          "bce": 0.7108143391087651,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.51953125,
+          "accuracy_by_length": {
+            "4": 0.5454545454545454,
+            "5": 0.5652173913043478,
+            "6": 0.6190476190476191,
+            "7": 0.42857142857142855,
+            "8": 0.5272727272727272
+          },
+          "bce": 0.6757479702064302,
+          "n": 256
+        }
+      },
+      "seed": 123,
+      "sha256": "c3d5d8ab9c168f52e45e7939624af4c767c631413850a3bffe4d1aa3dee337ff"
+    },
+    {
+      "bytes": 25799,
+      "loop_count": 2,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed123-looped-loop2.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.4140625,
+          "accuracy_by_length": {
+            "4": 0.8,
+            "5": 0.4444444444444444,
+            "6": 0.18181818181818182,
+            "7": 0.39473684210526316,
+            "8": 0.48148148148148145
+          },
+          "bce": 0.7217059961985797,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.484375,
+          "accuracy_by_length": {
+            "12": 0.3333333333333333,
+            "13": 0.4444444444444444,
+            "14": 0.625,
+            "15": 0.42857142857142855,
+            "16": 0.6153846153846154
+          },
+          "bce": 0.6985446284525096,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.49609375,
+          "accuracy_by_length": {
+            "4": 0.5454545454545454,
+            "5": 0.7391304347826086,
+            "6": 0.2857142857142857,
+            "7": 0.38571428571428573,
+            "8": 0.5909090909090909
+          },
+          "bce": 0.6834762217476964,
+          "n": 256
+        }
+      },
+      "seed": 123,
+      "sha256": "39a61f19dac433de7e485a76ecf2ce3299cf6a7ad9564e0925271305023b380b"
+    },
+    {
+      "bytes": 25799,
+      "loop_count": 4,
+      "model": "looped",
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "path": "checkpoints/seed123-looped-loop4.pt",
+      "recorded_metrics": {
+        "dev": {
+          "accuracy": 0.5390625,
+          "accuracy_by_length": {
+            "4": 0.8,
+            "5": 0.4444444444444444,
+            "6": 0.18181818181818182,
+            "7": 0.5789473684210527,
+            "8": 0.6481481481481481
+          },
+          "bce": 0.7098407689481974,
+          "n": 128
+        },
+        "heldout": {
+          "accuracy": 0.5,
+          "accuracy_by_length": {
+            "12": 0.43333333333333335,
+            "13": 0.3333333333333333,
+            "14": 0.5833333333333334,
+            "15": 0.5714285714285714,
+            "16": 0.6153846153846154
+          },
+          "bce": 0.7087613039184362,
+          "n": 128
+        },
+        "train": {
+          "accuracy": 0.61328125,
+          "accuracy_by_length": {
+            "4": 0.8181818181818182,
+            "5": 0.7391304347826086,
+            "6": 0.2857142857142857,
+            "7": 0.5428571428571428,
+            "8": 0.7363636363636363
+          },
+          "bce": 0.6715304659446701,
+          "n": 256
+        }
+      },
+      "seed": 123,
+      "sha256": "ca4a314d9b581485c309a2d2b0eb85e1341404cd7c6a93559b5e6e6e3c7ae7b9"
+    }
+  ],
+  "note": "Checkpoint files under checkpoints/ are gitignored local artifacts (25757-25905 bytes per file; see `bytes`/`sha256` per file below). Only this JSON manifest is tracked. The checkpoints are NOT portable: another machine or a different torch build may be unable to load them, and they must be regenerated with the documented command.",
+  "paired_summary": [
+    {
+      "decision": "baseline (reference)",
+      "loop_count": 1,
+      "model": "baseline",
+      "paired_delta_vs_baseline": {
+        "heldout_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "heldout_bce": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "in_distribution_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "length_generalization_drop": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "train_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        }
+      },
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "sequential_block_applications": 1
+    },
+    {
+      "decision": "flat",
+      "loop_count": 1,
+      "model": "looped",
+      "paired_delta_vs_baseline": {
+        "heldout_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "heldout_bce": {
+          "mean": 1.6919026772181192e-07,
+          "n_seeds": 3,
+          "per_seed": [
+            -5.122274160385132e-09,
+            -2.1886080503463745e-08,
+            5.345791578292847e-07
+          ],
+          "std": 3.165470534711311e-07,
+          "stderr": 1.8275852653274042e-07
+        },
+        "in_distribution_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "length_generalization_drop": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        },
+        "train_accuracy": {
+          "mean": 0.0,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "std": 0.0,
+          "stderr": 0.0
+        }
+      },
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "sequential_block_applications": 1
+    },
+    {
+      "decision": "flat",
+      "loop_count": 2,
+      "model": "looped",
+      "paired_delta_vs_baseline": {
+        "heldout_accuracy": {
+          "mean": 0.0078125,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.046875,
+            -0.0390625,
+            0.109375
+          ],
+          "std": 0.08804240366863003,
+          "stderr": 0.05083130545818525
+        },
+        "heldout_bce": {
+          "mean": -0.0045499370122949285,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0009453538805246353,
+            -0.0023259888403117657,
+            -0.012269176077097654
+          ],
+          "std": 0.006882253235966741,
+          "stderr": 0.003973470758416571
+        },
+        "in_distribution_accuracy": {
+          "mean": -0.05815972222222223,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.08854166666666669,
+            -0.059895833333333315,
+            -0.026041666666666685
+          ],
+          "std": 0.031286148074548784,
+          "stderr": 0.018063066012747233
+        },
+        "length_generalization_drop": {
+          "mean": -0.06597222222222222,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.041666666666666685,
+            -0.020833333333333315,
+            -0.13541666666666669
+          ],
+          "std": 0.06103609663627413,
+          "stderr": 0.035239206823236884
+        },
+        "train_accuracy": {
+          "mean": -0.06380208333333333,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.10546875,
+            -0.0625,
+            -0.0234375
+          ],
+          "std": 0.041031123064033156,
+          "stderr": 0.023689329946172205
+        }
+      },
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "sequential_block_applications": 2
+    },
+    {
+      "decision": "flat",
+      "loop_count": 4,
+      "model": "looped",
+      "paired_delta_vs_baseline": {
+        "heldout_accuracy": {
+          "mean": 0.041666666666666664,
+          "n_seeds": 3,
+          "per_seed": [
+            0.0,
+            0.0,
+            0.125
+          ],
+          "std": 0.07216878364870323,
+          "stderr": 0.04166666666666667
+        },
+        "heldout_bce": {
+          "mean": 0.005492907715961337,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.0007516168989241123,
+            0.01928284065797925,
+            -0.0020525006111711264
+          ],
+          "std": 0.0119601322115272,
+          "stderr": 0.006905185551868744
+        },
+        "in_distribution_accuracy": {
+          "mean": 0.03472222222222219,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.05208333333333337,
+            0.0625,
+            0.09374999999999994
+          ],
+          "std": 0.0767824457899166,
+          "stderr": 0.044330365745846194
+        },
+        "length_generalization_drop": {
+          "mean": -0.006944444444444475,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.05208333333333337,
+            0.0625,
+            -0.031250000000000056
+          ],
+          "std": 0.061036096636274136,
+          "stderr": 0.035239206823236884
+        },
+        "train_accuracy": {
+          "mean": 0.03125,
+          "n_seeds": 3,
+          "per_seed": [
+            -0.046875,
+            0.046875,
+            0.09375
+          ],
+          "std": 0.071602745233685,
+          "stderr": 0.04133986423538423
+        }
+      },
+      "parameter_counts": {
+        "frozen": 0,
+        "total": 4945,
+        "trainable": 4945
+      },
+      "sequential_block_applications": 4
+    }
+  ],
+  "reload_and_reevaluate": [
+    {
+      "checkpoint": "seed7-baseline-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "baseline",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 7,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed7-looped-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 7,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed7-looped-loop2.pt",
+      "loop_count": 2,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 7,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed7-looped-loop4.pt",
+      "loop_count": 4,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 7,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed42-baseline-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "baseline",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 42,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed42-looped-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 42,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed42-looped-loop2.pt",
+      "loop_count": 2,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 42,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed42-looped-loop4.pt",
+      "loop_count": 4,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 42,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed123-baseline-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "baseline",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 123,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed123-looped-loop1.pt",
+      "loop_count": 1,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 123,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed123-looped-loop2.pt",
+      "loop_count": 2,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 123,
+      "tolerance": 0.0001
+    },
+    {
+      "checkpoint": "seed123-looped-loop4.pt",
+      "loop_count": 4,
+      "matches_recorded": true,
+      "max_abs_accuracy_diff": 0.0,
+      "model": "looped",
+      "per_split_abs_accuracy_diff": {
+        "dev_accuracy": 0.0,
+        "heldout_accuracy": 0.0,
+        "train_accuracy": 0.0
+      },
+      "seed": 123,
+      "tolerance": 0.0001
+    }
+  ],
+  "rerun_command": "python -m rlt_rsi.train --backend torch --device auto --seeds 7,42,123 --epochs 80 --artifacts-dir results/torch-mps-2026-09-15",
+  "source": {
+    "git_commit": "f83bfb5d4e087f97f3dc3bac5cadcd7e628ff58d",
+    "git_dirty": true,
+    "git_status_porcelain": [
+      "M .gitignore",
+      " M CHANGELOG.md",
+      " M DESIGN.md",
+      " M README.md",
+      " M rlt_rsi/data.py",
+      " M rlt_rsi/model.py",
+      " M rlt_rsi/train.py",
+      " M tests/test_data.py",
+      " M tests/test_models.py",
+      "?? results/torch-mps-2026-09-15/",
+      "?? results/torch-smoke/",
+      "?? rlt_rsi/diagnostics.py",
+      "?? tests/test_report.py",
+      "?? tests/test_torch_training.py"
+    ]
+  },
+  "training": {
+    "batch": "full-batch (all train examples per step)",
+    "device": "mps",
+    "device_requested": "auto",
+    "dtype": "float32",
+    "epochs": 80,
+    "learning_rate": 0.003,
+    "optimizer": "AdamW",
+    "trainable_scope": "all parameters (end-to-end)",
+    "weight_decay": 0.0001
+  }
+}

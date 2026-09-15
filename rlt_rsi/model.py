@@ -4,11 +4,23 @@ The NumPy implementation freezes the transformer and trains only a binary
 readout, so it is a real, dependency-light smoke path—not a proxy claim for
 the full PyTorch experiment. With torch installed, ``Torch*`` trains all
 parameters and is the intended research run.
+
+The two backends are **not** the same architecture and their parameter counts
+differ by construction (never claim they are equal):
+
+* NumPy: manual scaled-dot-product attention, RMS-style normalization, frozen
+  backbone, and a trainable binary readout + bias (``d_model + 1`` trainable
+  parameters, everything else frozen).
+* PyTorch: ``nn.MultiheadAttention`` + ``nn.LayerNorm`` and full end-to-end
+  training of every parameter.
+
+Only the *width/head/feed-forward shape* (``d_model``, ``n_heads``, ``d_ff``)
+and the loop-count ablation are shared between backends.
 """
 
 from dataclasses import dataclass
 import math
-from typing import Optional
+from typing import Dict, Optional
 
 import numpy as np
 
@@ -95,11 +107,46 @@ class NumpyTransformerClassifier:
 
     @property
     def estimated_block_calls(self) -> int:
+        """Sequential applications of the shared block (a structural counter).
+
+        This is **not** a FLOP count and **not** a latency measurement; wall-clock
+        time is reported separately as ``seconds``. Name retained for backward
+        compatibility with earlier result files.
+        """
         return 1
 
     def architecture_parameters(self) -> int:
-        c = self.cfg
-        return int(2 * c.d_model + 4 * c.d_model * c.d_model + 2 * c.d_model * c.d_ff)
+        """Frozen backbone subtotal: embedding + transformer block weights only.
+
+        This deliberately excludes the trainable readout (``d_model``) and bias
+        (``1``), so it must never be reported as the total parameter count. Use
+        :meth:`total_parameters`, :meth:`trainable_parameters`, or
+        :meth:`frozen_parameters` for honest accounting. Kept for backward
+        compatibility with earlier result files that used this scope.
+        """
+        backbone = int(self.embedding.size)
+        backbone += sum(
+            int(w.size)
+            for w in (self.block.wq, self.block.wk, self.block.wv, self.block.wo, self.block.w1, self.block.w2)
+        )
+        return backbone
+
+    def trainable_parameters(self) -> int:
+        """Parameters updated by the NumPy trainer: readout vector + scalar bias."""
+        return int(self.readout.size + 1)
+
+    def frozen_parameters(self) -> int:
+        """Parameters created but never updated by the NumPy trainer."""
+        return self.architecture_parameters()
+
+    def total_parameters(self) -> int:
+        """All created parameters, including the trainable readout and bias."""
+        return self.frozen_parameters() + self.trainable_parameters()
+
+    def parameter_counts(self) -> Dict[str, int]:
+        total = self.total_parameters()
+        trainable = self.trainable_parameters()
+        return {"total": total, "trainable": trainable, "frozen": total - trainable}
 
 
 class NumpyLoopedTransformerClassifier(NumpyTransformerClassifier):
@@ -117,6 +164,7 @@ class NumpyLoopedTransformerClassifier(NumpyTransformerClassifier):
 
     @property
     def estimated_block_calls(self) -> int:
+        """Sequential shared-block applications; a structural counter, not FLOPs or latency."""
         return self._loop_count
 
     def features(self, tokens: np.ndarray, lengths: np.ndarray) -> np.ndarray:
