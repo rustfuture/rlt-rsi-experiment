@@ -121,7 +121,13 @@ def run_torch(model_kind: str, loop_count: int, splits: Dict[str, DatasetSplit],
         optim.step()
         losses.append(float(loss.detach()))
     model.eval()
-    result = {"epochs": epochs, "final_train_bce": losses[-1], "seconds": time.perf_counter() - start}
+    result = {
+        "estimated_block_calls": 1 if model_kind == "baseline" else loop_count,
+        "parameter_sharing": model_kind == "looped",
+        "epochs": epochs,
+        "final_train_bce": losses[-1],
+        "seconds": time.perf_counter() - start,
+    }
     with torch.no_grad():
         for name, split in splits.items():
             logits = model(torch.from_numpy(split.tokens), torch.from_numpy(split.lengths)).numpy()
@@ -142,6 +148,8 @@ def run_numpy(model_kind: str, loop_count: int, splits: Dict[str, DatasetSplit],
     start = time.perf_counter()
     fit = fit_numpy(model, splits["train"], epochs=epochs, learning_rate=learning_rate, l2=l2)
     result = {
+        "estimated_block_calls": 1 if model_kind == "baseline" else loop_count,
+        "parameter_sharing": model_kind == "looped",
         "epochs": epochs,
         "final_train_bce": fit["final_train_bce"],
         "seconds": time.perf_counter() - start,
