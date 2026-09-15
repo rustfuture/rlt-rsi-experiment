@@ -1,0 +1,184 @@
+{
+  "backend": "numpy",
+  "config": {
+    "d_ff": 48,
+    "d_model": 24,
+    "n_heads": 4,
+    "seed": 7
+  },
+  "environment": {
+    "numpy": "2.4.6",
+    "python": "3.14.5"
+  },
+  "results": [
+    {
+      "loop_count": 1,
+      "metrics": {
+        "architecture_parameters": 4656,
+        "backend_note": "NumPy fallback freezes transformer weights and trains only the binary readout; use --backend torch for the full trainable experiment.",
+        "dev": {
+          "accuracy": 0.5234375,
+          "accuracy_by_length": {
+            "4": 0.5238095238095238,
+            "5": 0.47368421052631576,
+            "6": 0.2857142857142857,
+            "7": 0.525,
+            "8": 0.7407407407407407
+          },
+          "bce": 0.6937039991337985,
+          "n": 128
+        },
+        "epochs": 40,
+        "final_train_bce": 0.6881720147189334,
+        "heldout": {
+          "accuracy": 0.484375,
+          "accuracy_by_length": {
+            "12": 0.5294117647058824,
+            "13": 0.4782608695652174,
+            "14": 0.5128205128205128,
+            "15": 0.55,
+            "16": 0.3793103448275862
+          },
+          "bce": 0.6985586329643754,
+          "n": 128
+        },
+        "seconds": 0.005429833006928675,
+        "train": {
+          "accuracy": 0.546875,
+          "accuracy_by_length": {
+            "4": 0.5,
+            "5": 0.5892857142857143,
+            "6": 0.6428571428571429,
+            "7": 0.4318181818181818,
+            "8": 0.5434782608695652
+          },
+          "bce": 0.6881528848923856,
+          "n": 256
+        },
+        "trainable_parameters": 25
+      },
+      "model": "baseline"
+    },
+    {
+      "loop_count": 2,
+      "metrics": {
+        "architecture_parameters": 4656,
+        "backend_note": "NumPy fallback freezes transformer weights and trains only the binary readout; use --backend torch for the full trainable experiment.",
+        "dev": {
+          "accuracy": 0.5234375,
+          "accuracy_by_length": {
+            "4": 0.5238095238095238,
+            "5": 0.47368421052631576,
+            "6": 0.2857142857142857,
+            "7": 0.525,
+            "8": 0.7407407407407407
+          },
+          "bce": 0.6922482273777377,
+          "n": 128
+        },
+        "epochs": 40,
+        "final_train_bce": 0.6871899387007268,
+        "heldout": {
+          "accuracy": 0.484375,
+          "accuracy_by_length": {
+            "12": 0.5294117647058824,
+            "13": 0.4782608695652174,
+            "14": 0.5128205128205128,
+            "15": 0.55,
+            "16": 0.3793103448275862
+          },
+          "bce": 0.698034044727885,
+          "n": 128
+        },
+        "seconds": 0.0044506250123959035,
+        "train": {
+          "accuracy": 0.546875,
+          "accuracy_by_length": {
+            "4": 0.5,
+            "5": 0.5892857142857143,
+            "6": 0.6428571428571429,
+            "7": 0.4318181818181818,
+            "8": 0.5434782608695652
+          },
+          "bce": 0.687161316997562,
+          "n": 256
+        },
+        "trainable_parameters": 25
+      },
+      "model": "looped"
+    },
+    {
+      "loop_count": 4,
+      "metrics": {
+        "architecture_parameters": 4656,
+        "backend_note": "NumPy fallback freezes transformer weights and trains only the binary readout; use --backend torch for the full trainable experiment.",
+        "dev": {
+          "accuracy": 0.46875,
+          "accuracy_by_length": {
+            "4": 0.47619047619047616,
+            "5": 0.6842105263157895,
+            "6": 0.5238095238095238,
+            "7": 0.45,
+            "8": 0.2962962962962963
+          },
+          "bce": 2.7453691751290554,
+          "n": 128
+        },
+        "epochs": 40,
+        "final_train_bce": 8.618857368294483,
+        "heldout": {
+          "accuracy": 0.46875,
+          "accuracy_by_length": {
+            "12": 0.35294117647058826,
+            "13": 0.43478260869565216,
+            "14": 0.5128205128205128,
+            "15": 0.6,
+            "16": 0.41379310344827586
+          },
+          "bce": 2.6168528807234877,
+          "n": 128
+        },
+        "seconds": 0.007679417001781985,
+        "train": {
+          "accuracy": 0.4921875,
+          "accuracy_by_length": {
+            "4": 0.5555555555555556,
+            "5": 0.44642857142857145,
+            "6": 0.5178571428571429,
+            "7": 0.4318181818181818,
+            "8": 0.5
+          },
+          "bce": 2.655840176316987,
+          "n": 256
+        },
+        "trainable_parameters": 25
+      },
+      "model": "looped"
+    }
+  ],
+  "seed": 7,
+  "split_manifest": {
+    "dev": {
+      "fingerprint": "beadd2e4171b6a8442216b9c9d98d882b5b71c65d4851930d6d7bfb5349d53ca",
+      "max_length": 8,
+      "min_length": 4,
+      "n": 128,
+      "seed": 209
+    },
+    "heldout": {
+      "fingerprint": "6b0a84773c3735b09164d3a5fd55a11b73a9da6689a0bc195aca543d0a556478",
+      "max_length": 16,
+      "min_length": 12,
+      "n": 128,
+      "seed": 310
+    },
+    "train": {
+      "fingerprint": "488851a8d043975e5bf8536dcbcca6c39375d2c18f5077a2f5b07592faa4679a",
+      "max_length": 8,
+      "min_length": 4,
+      "n": 256,
+      "seed": 108
+    }
+  },
+  "task": "binary sequence parity"
+}
