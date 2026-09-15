@@ -419,7 +419,10 @@ def _pooled_accuracy(train_metrics: Dict[str, object], dev_metrics: Dict[str, ob
 
 def _seed_metrics(run: Dict[str, object]) -> Dict[str, float]:
     """Per-seed scalar metrics, including the H2 length-generalization drop."""
-    in_distribution = _pooled_accuracy(run["train"], run["dev"])
+    # Dev examples are disjoint from training; fitting accuracy is not a
+    # generalization baseline. This statistic remains exploratory: a smaller
+    # gap can also result from worse short-sequence accuracy.
+    in_distribution = float(run["dev"]["accuracy"])
     return {
         "train_accuracy": float(run["train"]["accuracy"]),
         "dev_accuracy": float(run["dev"]["accuracy"]),
@@ -483,8 +486,18 @@ def _git_state(repo_root: Path) -> Dict[str, object]:
 
     commit = _run(["git", "rev-parse", "HEAD"])
     porcelain = _run(["git", "status", "--porcelain"])
+    # Include untracked implementation files too; exclude generated results,
+    # virtual environments and bytecode. Hash contents, not only dirty names.
+    source_files = sorted({*repo_root.glob('rlt_rsi/*.py'),
+                           *repo_root.glob('tests/*.py'),
+                           *repo_root.glob('.github/workflows/*.yml'),
+                           *repo_root.glob('*.toml')})
+    hashes = {str(p.relative_to(repo_root)): _sha256_file(p) for p in source_files}
+    tree_hash = hashlib.sha256(json.dumps(hashes, sort_keys=True).encode()).hexdigest()
     return {
         "git_commit": commit,
+        "source_files_sha256": hashes,
+        "source_tree_sha256": tree_hash,
         "git_status_porcelain": porcelain.splitlines() if porcelain else [],
         "git_dirty": bool(porcelain),
     }
@@ -823,7 +836,7 @@ def write_report(path: Path, payload: Dict[str, object]) -> None:
         )
         h2_detail = (
             " Length-generalization drop is defined per seed as "
-            "`in_distribution_accuracy(train+dev, lengths 4-8) - heldout_accuracy(lengths 12-16)`; "
+            "`in_distribution_accuracy(dev only, lengths 4-8) - heldout_accuracy(lengths 12-16)`; "
             f"H2 statistic = drop(baseline) - drop(looped), evaluated against the same +/-0.05 operational "
             f"rule. Results: {per_config}."
         )
@@ -1243,7 +1256,7 @@ def main(argv: Iterable[str] | None = None) -> int:
                 else "not supported in this run"
             ),
             "scope": scope_note,
-            "notes": "statistic = drop(baseline) - drop(looped), paired per seed.",
+            "notes": "Exploratory: drop uses dev only, excluding training. A smaller gap can reflect worse dev accuracy, not improved held-out accuracy. statistic = drop(baseline) - drop(looped), paired per seed.",
         },
         {
             "id": "H0",
@@ -1327,7 +1340,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         "metric_notes": {
             "estimated_block_calls": BLOCK_CALL_NOTE,
             "seconds": "Measured wall-clock training time (per configuration, averaged over seeds).",
-            "in_distribution_accuracy": "Pooled accuracy over train+dev examples (lengths 4-8).",
+            "in_distribution_accuracy": "Accuracy on disjoint dev examples only (lengths 4-8); training examples excluded. H2 is exploratory: a smaller gap may reflect worse dev accuracy, not improved held-out performance.",
             "length_generalization_drop": "in_distribution_accuracy - heldout_accuracy (per seed).",
             "paired_delta_vs_baseline": "Per-seed difference against the same-seed baseline run, then mean/std.",
             "decision": (

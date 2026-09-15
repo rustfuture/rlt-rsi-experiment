@@ -139,7 +139,7 @@ def test_report_includes_h2_and_paired_per_seed_deltas(tmp_path, base_payload):
 
     assert _row(md, "| H2 |")
     assert "length_generalization_drop" in md
-    assert "in_distribution_accuracy(train+dev, lengths 4-8) - heldout_accuracy" in md
+    assert "in_distribution_accuracy(dev only, lengths 4-8) - heldout_accuracy" in md
     assert "Paired per-seed differences vs the baseline" in md
     # Every non-baseline configuration reports its per-seed paired deltas.
     for row in payload["results"]:
