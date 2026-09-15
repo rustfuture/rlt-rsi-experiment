@@ -2,3 +2,5 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+# Local, non-portable training checkpoints (only the JSON manifest with SHA-256 hashes is tracked).
+results/*/checkpoints/
