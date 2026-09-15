@@ -89,6 +89,14 @@ class NumpyTransformerClassifier:
     def logits(self, features: np.ndarray) -> np.ndarray:
         return features @ self.readout + self.bias
 
+    @property
+    def loop_count(self) -> int:
+        return 1
+
+    @property
+    def estimated_block_calls(self) -> int:
+        return 1
+
     def architecture_parameters(self) -> int:
         c = self.cfg
         return int(2 * c.d_model + 4 * c.d_model * c.d_model + 2 * c.d_model * c.d_ff)
@@ -101,7 +109,15 @@ class NumpyLoopedTransformerClassifier(NumpyTransformerClassifier):
         super().__init__(cfg)
         if loop_count < 1:
             raise ValueError("loop_count must be >= 1")
-        self.loop_count = loop_count
+        self._loop_count = loop_count
+
+    @property
+    def loop_count(self) -> int:
+        return self._loop_count
+
+    @property
+    def estimated_block_calls(self) -> int:
+        return self._loop_count
 
     def features(self, tokens: np.ndarray, lengths: np.ndarray) -> np.ndarray:
         _, t = tokens.shape
