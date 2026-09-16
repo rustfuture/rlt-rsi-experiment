@@ -1,9 +1,7 @@
+<h1 align="center">RLT-RSI Experiment</h1>
 <p align="center">
-  <h1 align="center">RLT-RSI Experiment</h1>
-  <p align="center">
-    Looped transformers × RSI-style iterative adaptation — a reproducible parity
-    study of recurrent depth, length generalization, and bounded loop-schedule search.
-  </p>
+  Looped transformers × RSI-style iterative adaptation — a reproducible parity
+  study of recurrent depth, length generalization, and bounded loop-schedule search.
 </p>
 
 <p align="center">
