@@ -1,27 +1,16 @@
 
-# RLT-RSI Experiment: Dream-RSI Orchestration & Loop Scaling
-
-*Inspired by **Dream-RSI: Recursive Self-Improvement through Evolving Worlds** (Zheng et al., Sep 2026).*
-
-This repository provides a lightweight orchestration layer and a **Replay Simulator** for Recursive Self-Improvement (RSI). 
-Current self-improvement targets get exponentially harder, and testing new exploration policies (branching, parallel exploration, stopping) online incurs massive LLM evaluation costs. 
-
-Our architecture introduces a meta-layer RSI loop:
-1. **History as a Replay Simulator**: We conceptualize completed discovery histories as offline replay simulators.
-2. **Dreaming**: Candidate exploration policies are evaluated and refined by "dreaming" over the offline pool (zero LLM calls).
-3. **Loop Scaling Ablation**: At the architectural level, we also test scaling the transformer loop iterations during execution.
-
-## Quickstart: Replay Simulator (Dreaming)
-```bash
-python showcase_dream_rsi.py
-```
-This runs 3 different meta-exploration policies (Depth-first, Breadth-first, Greedy) over a stored exploration trace offline, evaluating efficiency without LLM inference.
-
+# RLT-RSI Experiment: Looped Transformers, Length Generalization, and RSI-Style Iterative Adaptation
 
 Reproducible minimal experiment comparing a conventional transformer with a
 shared-weight recurrent/looped transformer on binary sequence parity. The
 experiment probes iterative computation, compute scaling, and length
 generalization; it does not test or claim general reasoning ability.
+
+A separate mode adds **RSI-style iterative adaptation** over the recurrent loop
+schedule (`rlt_rsi.train_rsi`). It is a bounded engineering loop — bounded
+candidate loop counts, dev-set selection, and a final post-selection held-out
+evaluation — not unrestricted or general Recursive Self-Improvement, and it
+makes no claim of intelligence improvement.
 
 ## Research Questions
 
@@ -136,12 +125,44 @@ recorded in the manifest.
 - Dehghani et al. (2019). *Universal Transformers.* ICLR 2019. [arXiv:1807.03819](https://arxiv.org/abs/1807.03819). Recurrent depth with weight sharing; our looped block is a minimal instance.
 - Giannou et al. (2023). *Looped Transformers as Programmable Computers.* ICML 2023. [link](https://collaborate.princeton.edu/en/publications/looped-transformers-as-programmable-computers/). Looped depth as a computational resource; our `estimated_block_calls` is a structural depth proxy only.
 
-## RSI Iterative Experiment
+## RSI-Style Iterative Adaptation
 
-An explicit iterative self-improvement (RSI) layer is available via a separate execution mode:
+`rlt_rsi.train_rsi` adds a bounded iterative adaptation mode over the same parity
+task. It is deliberately narrow: the search only mutates the recurrent loop
+schedule, selection uses the `dev` split, and the held-out split is read only
+once at the end as a post-selection evaluation. It is **not** a general or
+unrestricted Recursive Self-Improvement system and makes no claim of
+intelligence improvement.
 
-```bash
-python -m rlt_rsi.train_rsi --backend numpy --rsi-generations 5 --rsi-epochs-per-gen 8
+Mechanism, repeated for `--rsi-generations` generations:
+
+```text
+current loop count
+→ bounded candidate loop counts (current, current + 1, current - 1, clamped to 1-8)
+→ train each candidate on the train split for --rsi-epochs-per-gen
+→ evaluate each candidate on the dev split
+→ select the candidate with the best dev accuracy (ties broken by lower dev BCE)
+→ carry the selected loop count into the next generation
+→ final held-out evaluation of the selected lineage (post-selection only)
 ```
 
-This RSI loop strictly bounds candidate generation to mutations of the recurrent loop schedule, isolates the held-out set completely from the candidate selection loop (which uses the `dev` set), and evaluates the final lineage. It allows explicit lineage tracking and cleanly separates baseline RLT runs from iterative adaptation.
+The held-out split is never used during candidate generation, scoring, or
+selection. Each `lineage` entry records the candidate proposals, the accepted
+loop count, the post-training train BCE, and dev accuracy/BCE; the run reports a
+finite `final_train_bce`.
+
+Real execution examples:
+
+```bash
+# NumPy backend (frozen features; plumbing check, no torch required)
+python -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
+    --rsi-generations 5 --rsi-epochs-per-gen 8 --output results/rsi_smoke.json
+
+# Torch backend (end-to-end training; device auto -> cuda, else mps, else cpu)
+python -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
+    --rsi-generations 5 --rsi-epochs-per-gen 8 --output results/rsi_torch.json
+```
+
+The RLT baseline documentation, research questions, and scientific limitations
+above still apply to this mode: it uses the same task, seeds, and small sample
+sizes, and its operational labels are not significance results.
