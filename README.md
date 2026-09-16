@@ -1,4 +1,22 @@
-# rlt-rsi-experiment
+
+# RLT-RSI Experiment: Dream-RSI Orchestration & Loop Scaling
+
+*Inspired by **Dream-RSI: Recursive Self-Improvement through Evolving Worlds** (Zheng et al., Sep 2026).*
+
+This repository provides a lightweight orchestration layer and a **Replay Simulator** for Recursive Self-Improvement (RSI). 
+Current self-improvement targets get exponentially harder, and testing new exploration policies (branching, parallel exploration, stopping) online incurs massive LLM evaluation costs. 
+
+Our architecture introduces a meta-layer RSI loop:
+1. **History as a Replay Simulator**: We conceptualize completed discovery histories as offline replay simulators.
+2. **Dreaming**: Candidate exploration policies are evaluated and refined by "dreaming" over the offline pool (zero LLM calls).
+3. **Loop Scaling Ablation**: At the architectural level, we also test scaling the transformer loop iterations during execution.
+
+## Quickstart: Replay Simulator (Dreaming)
+```bash
+python showcase_dream_rsi.py
+```
+This runs 3 different meta-exploration policies (Depth-first, Breadth-first, Greedy) over a stored exploration trace offline, evaluating efficiency without LLM inference.
+
 
 Reproducible minimal experiment comparing a conventional transformer with a
 shared-weight recurrent/looped transformer on binary sequence parity. The
