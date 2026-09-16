@@ -15,8 +15,8 @@
   <a href="#at-a-glance">At a Glance</a> ·
   <a href="#two-paths">Paths</a> ·
   <a href="#quick-start">Quick Start</a> ·
-  <a href="#reading-the-results-honestly">Results</a> ·
-  <a href="#scientific-integrity-notes">Integrity</a> ·
+  <a href="#interpreting-results">Results</a> ·
+  <a href="#evaluation-notes">Notes</a> ·
   <a href="#rsi-style-iterative-adaptation">RSI Mode</a>
 </p>
 
@@ -104,7 +104,7 @@ The runner evaluates 4 configurations across 3 seeds (`7, 42, 123`):
 - `looped` (loops=2): 2 sequential block applications per step
 - `looped` (loops=4): 4 sequential block applications per step
 
-## What Each Backend Actually Does
+## Backend Scope
 
 | | NumPy (`--backend numpy`) | PyTorch (`--backend torch`) |
 |---|---|---|
@@ -132,7 +132,7 @@ never the total. Use `total_parameters()` / `trainable_parameters()` / `frozen_p
 There is **no silent fallback**; the requested and resolved devices are recorded in the
 payload and report.
 
-## Reading the Results Honestly
+## Interpreting Results
 
 - **`estimated_block_calls`** counts sequential applications of the shared transformer
   block. It is a structural counter — **not** a FLOP count and **not** a latency
@@ -196,20 +196,20 @@ python -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
 | `results/archive-v1/` | Superseded v1 smoke output, retained as evidence |
 | `results/torch-smoke/` | Tiny CPU torch smoke run (`--epochs 2`) |
 | `results/torch-cpu-dev-reference/` | Corrected CPU torch reference (JSON + manifest + report) |
-| `results/torch-mps-2026-09-15/` | Recorded MPS run discussed in the integrity notes |
+| `results/torch-mps-2026-09-15/` | Recorded MPS run discussed in the evaluation notes |
 
 Checkpoint `.pt` files are small but **not portable** (machine/torch-build specific) and
 are gitignored under `results/*/checkpoints/`; only the JSON manifest with SHA-256 hashes
 is tracked. Regenerate them with the rerun command recorded in the manifest.
 
-## Scientific Integrity Notes
+## Evaluation Notes
 
 - **Measured MPS run-to-run instability (this round).** Re-running the recorded command
   (`--backend torch --device auto --seeds 7,42,123 --epochs 80`) reproduced the baseline
   and looped-2 results but changed looped-4: held-out accuracy 0.5052 → 0.5208 and paired
   delta +0.0417 → +0.0573, flipping the operational label from `flat` to `improvement`. MPS
   kernels are not bit-exact, so the ±0.05 label near the threshold is not stable across
-  identical re-runs. This is reported as a limitation, not hidden.
+  identical re-runs.
 - The hypotheses and decision rule are **specified in advance of the run** but are **not** a
   preregistered protocol: `DESIGN.md` and the first results were committed in the same
   commit (`161752a`), so commit history does not establish precedence.
