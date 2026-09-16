@@ -99,6 +99,7 @@ def run_rsi_torch(
             "accepted_loop_count": current_loop_count,
             "dev_accuracy": best["dev_accuracy"],
             "dev_bce": best["dev_bce"],
+            "train_bce": best["train_bce"],
         })
         
     # Final eval on all splits
@@ -146,7 +147,7 @@ def run_rsi_torch(
         "parameter_sharing": True,
         "epochs": generations * epochs_per_gen,
         "seed": seed,
-        "final_train_bce": lineage[-1]["dev_bce"] if lineage else 0.0,
+        "final_train_bce": lineage[-1]["train_bce"] if lineage else 0.0,
         "seconds": total_seconds,
         "device": str(device),
         "device_requested": str(device),
@@ -217,6 +218,7 @@ def run_rsi_numpy(
                 "loop_count": p_loop,
                 "dev_accuracy": eval_res["accuracy"],
                 "dev_bce": eval_res["bce"],
+                "train_bce": fit["final_train_bce"],
                 "readout": model.readout.copy(),
                 "bias": model.bias
             })
@@ -234,6 +236,7 @@ def run_rsi_numpy(
             "accepted_loop_count": current_loop_count,
             "dev_accuracy": best["dev_accuracy"],
             "dev_bce": best["dev_bce"],
+            "train_bce": best["train_bce"],
         })
         
     final_model = NumpyLoopedTransformerClassifier(cfg, current_loop_count)
@@ -261,7 +264,7 @@ def run_rsi_numpy(
         "parameter_sharing": True,
         "epochs": generations * epochs_per_gen,
         "seed": seed,
-        "final_train_bce": lineage[-1]["dev_bce"] if lineage else 0.0,
+        "final_train_bce": lineage[-1]["train_bce"] if lineage else 0.0,
         "seconds": total_seconds,
         "device": "cpu",
         "device_requested": "cpu",
