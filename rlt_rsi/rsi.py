@@ -69,7 +69,7 @@ def run_rsi_torch(
             elapsed = time.perf_counter() - start
             total_seconds += elapsed
             
-            # Eval on dev
+            # Eval on dev and train
             model.eval()
             with torch.no_grad():
                 logits = model(vx, vl).detach().cpu().numpy()
@@ -79,10 +79,17 @@ def run_rsi_torch(
                 eps = 1e-8
                 bce = float(-np.mean(vy_np * np.log(probs + eps) + (1 - vy_np) * np.log(1 - probs + eps)))
                 
+                # Compute train BCE
+                t_logits = model(tx, tl).detach().cpu().numpy()
+                t_probs = 1.0 / (1.0 + np.exp(-np.clip(t_logits, -40, 40)))
+                ty_np = splits["train"].labels
+                t_bce = float(-np.mean(ty_np * np.log(t_probs + eps) + (1 - ty_np) * np.log(1 - t_probs + eps)))
+                
             candidate_results.append({
                 "loop_count": p_loop,
                 "dev_accuracy": acc,
                 "dev_bce": bce,
+                "train_bce": t_bce,
                 "state_dict": copy.deepcopy(model.state_dict())
             })
             
