@@ -4,6 +4,8 @@ The whole module skips cleanly when torch is unavailable (e.g. the CI job on
 python 3.11), so the NumPy-only environment stays green.
 """
 
+import json
+
 import numpy as np
 import pytest
 
@@ -137,3 +139,44 @@ def test_overfit_diagnostic_on_a_separate_dataset_reduces_loss():
     assert diag["final_loss"] < diag["initial_loss"]
     assert diag["best_train_accuracy"] >= diag["initial_train_accuracy"]
     assert diag["seconds"] < 60.0
+
+def test_run_rsi_torch_regression():
+    """Torch RSI on CPU: completes, records a real train_bce, never selects on held-out.
+
+    This is the regression guard for the `best["train_bce"]` KeyError: the RSI
+    lineage must carry the post-training train BCE computed for every candidate,
+    and held-out data must not leak into lineage/selection information.
+    """
+    from rlt_rsi.rsi import run_rsi_torch
+
+    splits = make_splits(train_n=16, dev_n=8, heldout_n=8, seed=5)
+    cfg = NumpyConfig(d_model=16, n_heads=2, d_ff=32, seed=5)
+
+    result = run_rsi_torch(
+        splits,
+        cfg,
+        generations=2,
+        epochs_per_gen=1,
+        learning_rate=0.01,
+        weight_decay=0.01,
+        seed=5,
+        device=torch.device("cpu"),
+    )
+
+    # Execution completed with one lineage entry per generation.
+    lineage = result["lineage"]
+    assert len(lineage) == 2
+
+    for entry in lineage:
+        assert "train_bce" in entry, "lineage entry is missing the post-training train_bce"
+        assert np.isfinite(entry["train_bce"])
+        # Selection/lineage information must never expose the held-out split.
+        assert "heldout" not in entry
+        assert "heldout" not in json.dumps(entry, sort_keys=True)
+
+    # final_train_bce is finite and is the train BCE of the selected lineage entry.
+    assert np.isfinite(result["final_train_bce"])
+    assert result["final_train_bce"] == lineage[-1]["train_bce"]
+
+    # Held-out data is only ever touched for the final post-selection evaluation.
+    assert "heldout" in result
