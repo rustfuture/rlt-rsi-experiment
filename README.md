@@ -135,3 +135,13 @@ recorded in the manifest.
 - Anil et al. (2022). *Exploring Length Generalization in Large Language Models.* NeurIPS 2022. [link](https://mlanthology.org/neurips/2022/anil2022neurips-exploring/). Reported length-generalization failures motivate RQ3, but failure modes depend on training setup and are not universal.
 - Dehghani et al. (2019). *Universal Transformers.* ICLR 2019. [arXiv:1807.03819](https://arxiv.org/abs/1807.03819). Recurrent depth with weight sharing; our looped block is a minimal instance.
 - Giannou et al. (2023). *Looped Transformers as Programmable Computers.* ICML 2023. [link](https://collaborate.princeton.edu/en/publications/looped-transformers-as-programmable-computers/). Looped depth as a computational resource; our `estimated_block_calls` is a structural depth proxy only.
+
+## RSI Iterative Experiment
+
+An explicit iterative self-improvement (RSI) layer is available via a separate execution mode:
+
+```bash
+python -m rlt_rsi.train_rsi --backend numpy --rsi-generations 5 --rsi-epochs-per-gen 8
+```
+
+This RSI loop strictly bounds candidate generation to mutations of the recurrent loop schedule, isolates the held-out set completely from the candidate selection loop (which uses the `dev` set), and evaluates the final lineage. It allows explicit lineage tracking and cleanly separates baseline RLT runs from iterative adaptation.
