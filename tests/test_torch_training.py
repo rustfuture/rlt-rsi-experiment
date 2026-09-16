@@ -4,6 +4,8 @@ The whole module skips cleanly when torch is unavailable (e.g. the CI job on
 python 3.11), so the NumPy-only environment stays green.
 """
 
+import json
+
 import numpy as np
 import pytest
 
@@ -139,48 +141,42 @@ def test_overfit_diagnostic_on_a_separate_dataset_reduces_loss():
     assert diag["seconds"] < 60.0
 
 def test_run_rsi_torch_regression():
-    from rlt_rsi.data import DatasetSplit
-    import numpy as np
-    from rlt_rsi.config import NumpyConfig
+    """Torch RSI on CPU: completes, records a real train_bce, never selects on held-out.
+
+    This is the regression guard for the `best["train_bce"]` KeyError: the RSI
+    lineage must carry the post-training train BCE computed for every candidate,
+    and held-out data must not leak into lineage/selection information.
+    """
     from rlt_rsi.rsi import run_rsi_torch
-    import torch
-    
-    # Create tiny fixture
-    x = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.int32)
-    l = np.array([3, 3], dtype=np.int32)
-    y = np.array([0, 1], dtype=np.float32)
-    
-    splits = {
-        "train": DatasetSplit(x, l, y),
-        "dev": DatasetSplit(x, l, y),
-        "test": DatasetSplit(x, l, y)
-    }
-    
-    cfg = NumpyConfig(
-        vocab_size=10,
-        embedding_dim=8,
-        num_layers=1,
-        max_seq_len=5
-    )
-    
-    res = run_rsi_torch(
-        splits=splits,
-        cfg=cfg,
+
+    splits = make_splits(train_n=16, dev_n=8, heldout_n=8, seed=5)
+    cfg = NumpyConfig(d_model=16, n_heads=2, d_ff=32, seed=5)
+
+    result = run_rsi_torch(
+        splits,
+        cfg,
         generations=2,
         epochs_per_gen=1,
         learning_rate=0.01,
         weight_decay=0.01,
-        seed=42,
-        device=torch.device("cpu")
+        seed=5,
+        device=torch.device("cpu"),
     )
-    
-    # Verifies execution completes, train_bce in lineage, heldout absent
-    lineage = res["lineage"]
+
+    # Execution completed with one lineage entry per generation.
+    lineage = result["lineage"]
     assert len(lineage) == 2
-    for gen in lineage:
-        assert "train_bce" in gen
-        assert "test" not in gen
-    
-    # Verifies final_train_bce is finite
-    assert "train_bce" in res["metrics"]
-    assert np.isfinite(res["metrics"]["train_bce"])
+
+    for entry in lineage:
+        assert "train_bce" in entry, "lineage entry is missing the post-training train_bce"
+        assert np.isfinite(entry["train_bce"])
+        # Selection/lineage information must never expose the held-out split.
+        assert "heldout" not in entry
+        assert "heldout" not in json.dumps(entry, sort_keys=True)
+
+    # final_train_bce is finite and is the train BCE of the selected lineage entry.
+    assert np.isfinite(result["final_train_bce"])
+    assert result["final_train_bce"] == lineage[-1]["train_bce"]
+
+    # Held-out data is only ever touched for the final post-selection evaluation.
+    assert "heldout" in result
