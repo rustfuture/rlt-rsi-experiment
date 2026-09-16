@@ -137,3 +137,50 @@ def test_overfit_diagnostic_on_a_separate_dataset_reduces_loss():
     assert diag["final_loss"] < diag["initial_loss"]
     assert diag["best_train_accuracy"] >= diag["initial_train_accuracy"]
     assert diag["seconds"] < 60.0
+
+def test_run_rsi_torch_regression():
+    from rlt_rsi.data import DatasetSplit
+    import numpy as np
+    from rlt_rsi.config import NumpyConfig
+    from rlt_rsi.rsi import run_rsi_torch
+    import torch
+    
+    # Create tiny fixture
+    x = np.array([[1, 2, 3], [4, 5, 6]], dtype=np.int32)
+    l = np.array([3, 3], dtype=np.int32)
+    y = np.array([0, 1], dtype=np.float32)
+    
+    splits = {
+        "train": DatasetSplit(x, l, y),
+        "dev": DatasetSplit(x, l, y),
+        "test": DatasetSplit(x, l, y)
+    }
+    
+    cfg = NumpyConfig(
+        vocab_size=10,
+        embedding_dim=8,
+        num_layers=1,
+        max_seq_len=5
+    )
+    
+    res = run_rsi_torch(
+        splits=splits,
+        cfg=cfg,
+        generations=2,
+        epochs_per_gen=1,
+        learning_rate=0.01,
+        weight_decay=0.01,
+        seed=42,
+        device=torch.device("cpu")
+    )
+    
+    # Verifies execution completes, train_bce in lineage, heldout absent
+    lineage = res["lineage"]
+    assert len(lineage) == 2
+    for gen in lineage:
+        assert "train_bce" in gen
+        assert "test" not in gen
+    
+    # Verifies final_train_bce is finite
+    assert "train_bce" in res["metrics"]
+    assert np.isfinite(res["metrics"]["train_bce"])
