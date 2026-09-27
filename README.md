@@ -1,34 +1,29 @@
-<h1 align="center">RLT-RSI Experiment</h1>
-<p align="center">
-  Looped transformers × RSI-style iterative adaptation — a reproducible parity
-  study of recurrent depth, length generalization, and bounded loop-schedule search.
-</p>
+# RLT-RSI Experiment
 
-<p align="center">
+A reproducible experimental benchmark comparing conventional and shared-weight looped transformers on binary sequence parity, built for machine learning researchers studying recurrent depth, length generalization, and bounded loop-schedule adaptation.
+
+<p align="left">
   <a href="https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml/badge.svg?branch=main"></a>
-  <img alt="Python 3.9+" src="https://img.shields.io/badge/python-3.9%2B-blue?style=flat-square">
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-green?style=flat-square"></a>
-  <a href="https://colab.research.google.com/github/rustfuture/rlt-rsi-experiment/blob/main/notebooks/rlt_rsi_colab.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
 </p>
+
+**Status:** Experimental research prototype (v0.3.0). Evaluates small-scale algorithmic parity across NumPy smoke tests and PyTorch models with committed run manifests and verified split integrity.
+
+- **Baseline vs. Looped Models:** Evaluates a single-pass conventional transformer against a shared-weight looped architecture (1, 2, and 4 iterations) on binary sequence parity.
+- **Length Generalization:** Tests out-of-distribution transfer from short train/dev sequences (lengths 4–8) to longer held-out sequences (lengths 12–16) across fixed seeds (`7, 42, 123`).
+- **Data Leakage Controls:** Asserts zero exact-example overlap between train, dev, and held-out splits with automated per-seed assertions.
+- **RSI Iterative Adaptation:** Implements bounded loop-schedule search (`rlt_rsi.train_rsi`) that mutates candidate loop counts (clamped to 1–8) with dev-set selection and post-selection held-out evaluation.
+- **Dual Execution Backends:** Provides a fast, deterministic NumPy CPU smoke runner (frozen backbone) for pipeline checks and an end-to-end PyTorch training pipeline with explicit device resolution (`--device auto|cpu|mps|cuda`).
 
 <p align="center">
-  <a href="#at-a-glance">At a Glance</a> ·
-  <a href="#two-paths">Paths</a> ·
   <a href="#quick-start">Quick Start</a> ·
+  <a href="#how-the-rsi-loop-works">How RSI Works</a> ·
+  <a href="#backend-scope">Backend Scope</a> ·
   <a href="#interpreting-results">Results</a> ·
-  <a href="#evaluation-notes">Notes</a> ·
-  <a href="#rsi-style-iterative-adaptation">RSI Mode</a>
+  <a href="#rsi-style-iterative-adaptation">RSI Adaptation</a> ·
+  <a href="#artifacts">Artifacts</a> ·
+  <a href="#scope-and-limitations">Limitations</a>
 </p>
-
-A minimal, reproducible experiment comparing a conventional transformer with a
-shared-weight recurrent/looped transformer on binary sequence parity. The experiment
-probes iterative computation, compute scaling, and length generalization; it does not
-test or claim general reasoning ability.
-
-On top of that baseline, a separate mode performs **RSI-style iterative adaptation**
-over the recurrent loop schedule — bounded candidate loop counts, dev-set selection, and
-a final post-selection held-out evaluation. It is not unrestricted or general Recursive
-Self-Improvement and makes no claim of intelligence improvement.
 
 ## At a Glance
 
@@ -62,13 +57,13 @@ Self-Improvement and makes no claim of intelligence improvement.
 
 ```mermaid
 flowchart TD
-    K[Current loop count] --> G[Generate k-1, k, k+1 - clamped to 1-8]
-    G --> T[Train each candidate on train]
-    T --> D[Evaluate on dev]
-    D --> S[Select best dev accuracy - tie-break lower dev BCE]
-    S --> N[Next generation]
+    K["Current loop count"] --> G["Generate k-1, k, k+1 - clamped to 1-8"]
+    G --> T["Train each candidate on train"]
+    T --> D["Evaluate on dev"]
+    D --> S["Select best dev accuracy - tie-break lower dev BCE"]
+    S --> N["Next generation"]
     N -->|more generations| G
-    N -->|done| H[Final held-out evaluation - post-selection only]
+    N -->|done| H["Final held-out evaluation - post-selection only"]
 ```
 
 ## Quick Start
@@ -76,26 +71,25 @@ flowchart TD
 ```bash
 # Setup
 python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -e '.[dev]'
+source .venv/bin/activate
+pip install -e '.[dev]'
 
-# Optional: real training backend (not required for the NumPy smoke path)
-python -m pip install -e '.[torch]'
-
-# NumPy smoke pipeline (frozen features; plumbing check only)
-python -m rlt_rsi.train --backend numpy --seeds 7,42,123 --output results/smoke.json
-
-# Torch pipeline (device auto -> cuda, else mps, else cpu)
-python -m rlt_rsi.train --backend torch --device auto --seeds 7,42,123 --epochs 80 \
-    --artifacts-dir results/torch-<device>-<date>
-
-# Test suite
+# Run test suite
 pytest -q
+
+# NumPy smoke pipeline (frozen features; fast CPU check)
+python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 --output results/smoke.json
+
+# RSI iterative adaptation loop (NumPy backend)
+python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 --rsi-generations 2 --rsi-epochs-per-gen 2 --output results/rsi_smoke.json
+
+# Optional: PyTorch end-to-end training (requires 'pip install -e .[torch]')
+python3 -m rlt_rsi.train --backend torch --device auto --seeds 7,42,123 --epochs 80 \
+    --artifacts-dir results/torch-run
 ```
 
 Prefer no local setup? Open [`notebooks/rlt_rsi_colab.ipynb`](notebooks/rlt_rsi_colab.ipynb)
-in Colab. Stage A is a CPU-safe NumPy smoke and RSI run; Stage B runs the Torch path only
-when a GPU is available.
+in Colab. Stage A is a CPU-safe NumPy smoke and RSI run; Stage B runs the Torch path when a GPU is available.
 
 The runner evaluates 4 configurations across 3 seeds (`7, 42, 123`):
 
@@ -111,7 +105,7 @@ The runner evaluates 4 configurations across 3 seeds (`7, 42, 123`):
 | Attention | manual scaled dot-product | `nn.MultiheadAttention` |
 | Normalization | RMS-style | `nn.LayerNorm` |
 | Training scope | **frozen** embedding + block; **only** the linear readout + bias are trained | **all** parameters, end-to-end |
-| Parameters | total 4,681 = frozen 4,656 + trainable 25 | total 4,945, all trainable |
+| Parameters | total 4,681 = frozen 4,656 + trainable 25 ([`tests/test_models.py`](tests/test_models.py)) | total 4,945, all trainable ([`tests/test_torch_training.py`](tests/test_torch_training.py)) |
 | dtype / device | float64 / CPU | float32 / resolved torch device |
 | Purpose | smoke + plumbing check; **not** evidence about trained recurrence | intended research run |
 
@@ -149,7 +143,7 @@ payload and report.
   `drop = dev_accuracy(lengths 4–8) - heldout_accuracy(lengths 12–16)`, excluding training
   examples. A smaller gap can reflect worse dev performance, so it is exploratory and must
   be read alongside absolute accuracies. The corrected reference is
-  `results/torch-cpu-dev-reference/`.
+  [`results/torch-cpu-dev-reference/`](results/torch-cpu-dev-reference/).
 - **Splits are example-disjoint by construction.** Train/dev are drawn as one joint pool
   of unique examples and randomly partitioned; held-out uses disjoint lengths and excludes
   train/dev examples. The overlap count per seed is recorded and asserted to be zero;
@@ -180,11 +174,11 @@ train BCE, and dev accuracy/BCE; the run reports a finite `final_train_bce`.
 
 ```bash
 # NumPy backend (frozen features; plumbing check, no torch required)
-python -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
+python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
     --rsi-generations 5 --rsi-epochs-per-gen 8 --output results/rsi_smoke.json
 
 # Torch backend (end-to-end training; device auto -> cuda, else mps, else cpu)
-python -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
+python3 -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
     --rsi-generations 5 --rsi-epochs-per-gen 8 --output results/rsi_torch.json
 ```
 
@@ -192,35 +186,26 @@ python -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
 
 | Path | Contents |
 |---|---|
-| `results/smoke.json`, `results/smoke.md` | NumPy smoke output (frozen features; plumbing check only) |
-| `results/archive-v1/` | Superseded v1 smoke output, retained as evidence |
-| `results/torch-smoke/` | Tiny CPU torch smoke run (`--epochs 2`) |
-| `results/torch-cpu-dev-reference/` | Corrected CPU torch reference (JSON + manifest + report) |
-| `results/torch-mps-2026-09-15/` | Recorded MPS run discussed in the evaluation notes |
+| [`results/smoke.json`](results/smoke.json), [`results/smoke.md`](results/smoke.md) | NumPy smoke output (frozen features; plumbing check only) |
+| [`results/archive-v1/`](results/archive-v1/) | Superseded v1 smoke output, retained as evidence |
+| [`results/torch-smoke/`](results/torch-smoke/) | Tiny CPU torch smoke run (`--epochs 2`) |
+| [`results/torch-cpu-dev-reference/`](results/torch-cpu-dev-reference/) | Corrected CPU torch reference (JSON + manifest + report) |
+| [`results/torch-mps-2026-09-15/`](results/torch-mps-2026-09-15/) | Recorded MPS run discussed in the evaluation notes |
 
 Checkpoint `.pt` files are small but **not portable** (machine/torch-build specific) and
 are gitignored under `results/*/checkpoints/`; only the JSON manifest with SHA-256 hashes
 is tracked. Regenerate them with the rerun command recorded in the manifest.
 
-## Evaluation Notes
+## Scope and Limitations
 
-- **Measured MPS run-to-run instability (this round).** Re-running the recorded command
-  (`--backend torch --device auto --seeds 7,42,123 --epochs 80`) reproduced the baseline
-  and looped-2 results but changed looped-4: held-out accuracy 0.5052 → 0.5208 and paired
-  delta +0.0417 → +0.0573, flipping the operational label from `flat` to `improvement`. MPS
-  kernels are not bit-exact, so the ±0.05 label near the threshold is not stable across
-  identical re-runs.
-- The hypotheses and decision rule are **specified in advance of the run** but are **not** a
-  preregistered protocol: `DESIGN.md` and the first results were committed in the same
-  commit (`161752a`), so commit history does not establish precedence.
-- NumPy frozen-feature smoke results **do not measure whether trained recurrence helps**;
-  they verify plumbing, determinism, and aggregation only.
-- Torch runs train end-to-end, but with 3 seeds and small sample sizes the ±0.05 rule cannot
-  establish significance or equivalence. Any "improvement" label is an operational-rule
-  outcome for this run only.
-- CI runs `pytest -q` plus a NumPy smoke in a Python 3.11 job without torch, and the
-  Torch-CPU job installs CPU torch and runs the full suite including the Torch RSI
-  regression test.
+- **Algorithmic Parity Scope (No General Reasoning):** Sequence parity is a narrow algorithmic check on binary sequences; findings do not evaluate language modeling, multi-step reasoning, or general cognitive capabilities.
+- **Bounded RSI Adaptation Scope:** The RSI mode is strictly a bounded heuristic search over integer loop schedules (clamped to 1–8) using dev-set selection; it is not general Recursive Self-Improvement and makes no claim of intelligence improvement.
+- **Operational Decision Threshold (±0.05):** The ±0.05 held-out accuracy threshold across N=3 seeds is an operational decision heuristic, not a formal statistical significance or equivalence test.
+- **Backend Comparability:** The NumPy backend uses a frozen backbone with trained readout (total 4,681 parameters) as a fast smoke test; PyTorch trains all parameters end-to-end (total 4,945 parameters). Architectures differ and are not directly comparable across backends.
+- **Hardware Nondeterminism & Stability:** Re-running identical PyTorch MPS runs on Apple Silicon revealed kernel-level variation where looped-4 held-out accuracy moved from 0.5052 (`flat`) to 0.5208 (`improvement`), crossing the operational boundary (documented in [`results/torch-mps-2026-09-15/run.md`](results/torch-mps-2026-09-15/run.md)). For bit-exact reproducibility, use `--device cpu`.
+- **Checkpoint Portability:** Checkpoint files (`.pt`) are local machine-specific artifacts and gitignored; only the JSON manifest with SHA-256 hashes is tracked in version control.
+- **Specified Hypotheses, Not Preregistration:** Hypotheses and decision rules were specified in advance of analysis, but because [`DESIGN.md`](DESIGN.md) and initial results were committed in the same commit (`161752a`), the repository documents this as specified hypotheses rather than claiming external preregistration.
+- **CI Test Coverage:** CI runs `pytest -q` plus a NumPy smoke in a Python 3.11 job without torch, and a Torch-CPU job installs CPU torch and runs the full suite including the Torch RSI regression test.
 
 <details>
 <summary>Design references (scoped theory context)</summary>
@@ -245,14 +230,16 @@ is tracked. Regenerate them with the rerun command recorded in the manifest.
 
 | Path | Contents |
 |---|---|
-| `rlt_rsi/train.py` | Baseline and looped training, backends, evaluation |
-| `rlt_rsi/train_rsi.py` | RSI-style iterative adaptation CLI and reporting |
-| `rlt_rsi/rsi.py` | RSI loop (`run_rsi_numpy`, `run_rsi_torch`) |
-| `rlt_rsi/data.py` | Example-disjoint split generation and manifests |
-| `rlt_rsi/model.py` | NumPy model and configuration |
-| `tests/` | Data, model, generalization, RSI, and torch tests |
-| `results/` | Committed experiment artifacts |
-| `notebooks/rlt_rsi_colab.ipynb` | CPU smoke + optional GPU walkthrough |
+| [`rlt_rsi/train.py`](rlt_rsi/train.py) | Baseline and looped training, backends, evaluation |
+| [`rlt_rsi/train_rsi.py`](rlt_rsi/train_rsi.py) | RSI-style iterative adaptation CLI and reporting |
+| [`rlt_rsi/rsi.py`](rlt_rsi/rsi.py) | RSI loop (`run_rsi_numpy`, `run_rsi_torch`) |
+| [`rlt_rsi/data.py`](rlt_rsi/data.py) | Example-disjoint split generation and manifests |
+| [`rlt_rsi/model.py`](rlt_rsi/model.py) | NumPy model and configuration |
+| [`rlt_rsi/diagnostics.py`](rlt_rsi/diagnostics.py) | Overfit diagnostic routines for optimization checks |
+| [`tests/`](tests/) | Data, model, generalization, RSI, and torch tests |
+| [`results/`](results/) | Committed experiment artifacts |
+| [`notebooks/rlt_rsi_colab.ipynb`](notebooks/rlt_rsi_colab.ipynb) | CPU smoke + optional GPU walkthrough |
+| [`DESIGN.md`](DESIGN.md) | Architectural controls, research questions, and hypotheses |
 
 ## License
 
