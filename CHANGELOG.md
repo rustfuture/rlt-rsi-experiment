@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* **Paired 95% confidence intervals:** the paired per-seed differences vs baseline now carry a two-sided 95% Student-t interval (`ci95_low`/`ci95_high` in the JSON payload, `95% CI (t)` column in the report; `None`/`n/a` for N<2). The t critical values live in `rlt_rsi/stats.py` (no SciPy dependency) and are covered by `tests/test_stats.py`. The ±0.05 decision rule is unchanged and remains operational, not a significance test. Default seeds stay `7,42,123` so committed artifacts are unaffected; use more seeds (for example `--seeds 1,2,3,4,5,6,7,8,9,10`) for tighter intervals.
+
 ## 0.3.0 — research correction round
 
 * **Real device support:** added `--device auto|cpu|mps|cuda` and `resolve_device()` with explicit `RuntimeError` on unavailable `cuda`/`mps` (no silent fallback). Torch runs move the model and every split to the selected device and convert back with `.detach().cpu().numpy()`; the resolved device, requested device, torch/python/numpy versions, dtype, seed, epochs, optimizer (AdamW), learning rate, weight decay and `determinism_notes` are recorded per run and per payload.

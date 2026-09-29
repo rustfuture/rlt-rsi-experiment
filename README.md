@@ -73,7 +73,7 @@ The NumPy CI job runs on Python 3.11; a separate job installs CPU PyTorch. Tests
 
 - The task covers sequence parity only; it does not test language modeling or general reasoning.
 - Adaptation is a bounded heuristic over loop counts from 1–8, selected on validation data. It is not general Recursive Self-Improvement.
-- The ±0.05 held-out accuracy threshold across N=3 seeds is an operational rule, not a statistical significance test.
+- The ±0.05 held-out accuracy threshold across N=3 seeds is an operational rule, not a statistical significance test. Reports include paired 95% t-intervals; with N=3 they are very wide (t=4.30), so pass more seeds (for example `--seeds 1,2,3,4,5,6,7,8,9,10`) before reading anything into a label.
 - The NumPy and PyTorch backends use different architectures and parameter counts; see the [backend comparison](docs/reference.md#backend-architecture-comparison) and its [model test](tests/test_models.py) and [PyTorch test](tests/test_torch_training.py).
 - On repeated Apple Silicon MPS runs, looped-4 held-out accuracy moved from 0.5052 (`flat`) to 0.5208 (`improvement`) ([run details](results/torch-mps-2026-09-15/run.md)). Use `--device cpu` for bit-exact reproducibility.
 - The hypotheses were specified before analysis, but are not described as preregistered because [`DESIGN.md`](DESIGN.md) and initial results were committed together (`161752a`).
