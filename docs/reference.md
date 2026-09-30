@@ -39,6 +39,8 @@ python3 -m rlt_rsi.train_rsi --backend torch --device auto --seeds 7,42,123 \
     --rsi-generations 5 --rsi-epochs-per-gen 8 --output results/rsi_torch.json
 ```
 
+These commands write `results/rsi_smoke.json` and `results/rsi_torch.json` locally; neither file is committed, and no RSI-adaptation result is committed to this repository yet.
+
 ## Backend Architecture Comparison
 
 | | NumPy (`--backend numpy`) | PyTorch (`--backend torch`) |
@@ -67,10 +69,10 @@ There is **no silent fallback**; the requested and resolved devices are recorded
 
 - `estimated_block_calls` counts sequential applications of the shared transformer block. It is a structural counter — **not** a FLOP count and **not** a latency measurement. Measured wall-clock training time is reported separately as `seconds`.
 - **Equal epoch counts are not equal compute budgets.** A `loop_count=k` configuration performs `k` block applications per optimisation step, so higher loop counts do more work per step. Compare the measured `seconds` column (hardware-specific).
-- **The ±5 percentage-point rule is an operational decision rule only.** It is not a statistical significance test, confidence interval, or equivalence test. Results are scoped to this run, task, seeds, and sample sizes.
-- **Paired per-seed deltas** (`paired_delta_vs_baseline`, with mean/std/stderr) are reported per configuration alongside aggregate means.
+- **The ±5 percentage-point rule is an operational decision rule only.** It is not a statistical significance test or equivalence test, and it does not use the reported 95% interval. Results are scoped to this run, task, seeds, and sample sizes.
+- **Paired per-seed deltas** (`paired_delta_vs_baseline`, with mean/std/stderr and `ci95_low`/`ci95_high`) are reported per configuration alongside aggregate means. The interval is a two-sided 95% Student-t interval for the mean of the per-seed differences (looped minus baseline, same seed), computed by `rlt_rsi.stats.mean_ci95`; it is `null` (reported as `n/a`) for fewer than two seeds. With the default 3 seeds it uses t = 4.303 and is very wide.
 - **Near-chance results.** In every committed run all configurations are near chance (held-out accuracy 0.464–0.521, held-out BCE about ln 2). H1/H2 verdicts in those reports compare numbers that are close to chance and are not evidence that the models learned parity or that looping helps.
-- **H1, H2 and H0 are operational rules.** H2 uses `drop = dev_accuracy(lengths 4–8) - heldout_accuracy(lengths 12–16)`, excluding training examples. A smaller gap can reflect worse dev performance, so it is exploratory and must be read alongside absolute accuracies. The corrected reference is [`results/torch-cpu-dev-reference/`](../results/torch-cpu-dev-reference/).
+- **H1, H2 and H0 are operational rules.** H2 uses `drop = dev_accuracy(lengths 4–8) - heldout_accuracy(lengths 12–16)`, excluding training examples. A smaller gap can reflect worse dev performance, so it is exploratory and must be read alongside absolute accuracies. The corrected reference is [`results/torch-cpu-dev-reference/`](../results/torch-cpu-dev-reference/); the older [MPS run](../results/torch-mps-2026-09-15/run.md) used pooled train+dev accuracy for this quantity, so its H2 verdict is not comparable (see the dated note at the end of its `run.md`).
 - **Splits are example-disjoint by construction.** Train/dev are drawn as one joint pool of unique examples and randomly partitioned; held-out uses disjoint lengths and excludes train/dev examples. The overlap count per seed is recorded and asserted to be zero; `make_splits` raises rather than returning overlapping examples.
 - Because unique examples are required, the empirical length distribution deviates from uniform (the short-length example spaces are tiny); per-split `length_counts` are recorded in the split manifest.
 
