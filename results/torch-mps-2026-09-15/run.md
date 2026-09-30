@@ -148,3 +148,13 @@ Historical note: `results/smoke.json` and `results/smoke.md` predate this genera
 
 See [DESIGN.md](DESIGN.md) for the specified hypotheses and the fixed decision rule. The commit history does **not** establish preregistration: DESIGN.md and the first results were committed in the same commit (161752a), so these are specified hypotheses and a fixed decision rule, not a preregistration claim.
 
+
+---
+
+## Editorial note added 2026-09-30 (the numbers above are unchanged)
+
+This note was added after the run; nothing above it was edited.
+
+1. **`in_distribution_accuracy` and H2 use an older definition.** Section 2, section 4 (item 3), section 5 (H2) and the Metric notes above define `in_distribution_accuracy` as accuracy pooled over train+dev examples (lengths 4-8). The current code (`rlt_rsi/train.py`) and [`docs/reference.md`](../../docs/reference.md) define it as dev examples only. The corrected-definition reference run is [`results/torch-cpu-dev-reference/`](../torch-cpu-dev-reference/run.md). The H2 result "supported for at least one loop count" in this file rests on the pooled definition. Recomputed from the per-seed values in `run.json` with the dev-only definition (`drop = dev_accuracy - heldout_accuracy`), the H2 statistic is +0.0000 for looped-1, +0.0547 for looped-2 and +0.0000 for looped-4; the looped-2 value comes from a dev accuracy (0.417) that is below 0.5, not from better held-out accuracy (0.471 vs 0.464 for the baseline).
+2. **All configurations are near chance.** Every held-out accuracy above is between 0.464 and 0.505, train accuracy is between 0.49 and 0.59, and per-seed held-out BCE is 0.692-0.721 (ln 2 = 0.693 is the loss of a constant 0.5 prediction). These runs do not show that any configuration learned parity, so the H2 "supported" verdict reflects differences between numbers that are close to chance, on 3 seeds and 128 examples.
+3. **No MPS repeat is committed.** This file records one MPS run, in which looped-4 held-out accuracy is 0.5052 (paired delta +0.0417, `flat`). The looped-4 value 0.5208 (paired delta +0.0573, `improvement`) is committed only for the `--device cpu` run in [`results/torch-cpu-dev-reference/`](../torch-cpu-dev-reference/run.md). The claim that a repeated MPS run moved from 0.5052 to 0.5208 has no committed artifact, and no test or artifact verifies bit-exact reproducibility on any device.
