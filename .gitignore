@@ -7,3 +7,4 @@ __pycache__/
 target/
 # Local, non-portable training checkpoints (only the JSON manifest with SHA-256 hashes is tracked).
 results/*/checkpoints/
+rlt_rsi_experiment.egg-info/
