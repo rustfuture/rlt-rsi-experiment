@@ -29,8 +29,6 @@ from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 
-from .stats import mean_ci95
-
 from .rsi import run_rsi_torch, run_rsi_numpy
 from .data import (
     DatasetSplit,
@@ -44,6 +42,7 @@ from .model import (
     NumpyTransformerClassifier,
     sigmoid,
 )
+from .stats import mean_ci95
 
 EXPERIMENT_CONFIGS: Tuple[Tuple[str, int], ...] = (
     ("baseline", 1),
@@ -597,6 +596,8 @@ def write_artifacts(
                         "mean": values["mean"],
                         "std": values["std"],
                         "stderr": values["stderr"],
+                        "ci95_low": values.get("ci95_low"),
+                        "ci95_high": values.get("ci95_high"),
                         "per_seed": values["per_seed"],
                         "n_seeds": values["n_seeds"],
                     }
@@ -754,8 +755,9 @@ def write_report(path: Path, payload: Dict[str, object]) -> None:
         "## 3. Paired per-seed differences vs the baseline",
         "",
         "Differences are computed **per seed** against the baseline run with the same seed (paired), then "
-        "averaged. `n_seeds` is small; the standard error is reported so it is not mistaken for a "
-        "significance test.",
+        "averaged. `n_seeds` is small; the standard error and a two-sided 95% Student-t interval "
+        "for the mean paired difference are reported (the interval is very wide for few seeds, and "
+        "is not a significance test of the +/-0.05 decision rule).",
         "",
         "| model | loops | metric | per-seed (looped - baseline) | mean | std | stderr | 95% CI (t) |",
         "|---|---:|---|---:|---:|---:|---:|---:|",
@@ -768,7 +770,7 @@ def write_report(path: Path, payload: Dict[str, object]) -> None:
             per_seed = ", ".join(_fmt_signed(v) for v in pd["per_seed"])
             lines.append(
                 f"| {row['model']} | {row['loop_count']} | {metric} | {per_seed} | {pd['mean']:+.4f} | "
-                f"{pd['std']:.4f} | {pd['stderr']:.4f} | {_fmt_ci(pd['ci95_low'], pd['ci95_high'])} |"
+                f"{pd['std']:.4f} | {pd['stderr']:.4f} | {_fmt_ci(pd.get('ci95_low'), pd.get('ci95_high'))} |"
             )
     lines.append("")
 
@@ -1131,13 +1133,14 @@ def main(argv: Iterable[str] | None = None) -> int:
         for metric in PAIRED_METRICS:
             deltas = [m[metric] - b[metric] for m, b in zip(seed_metrics, baseline_seed_metrics)]
             st = summarize_stats(deltas)
+            ci_low, ci_high = mean_ci95(deltas)
             paired[metric] = {
                 "per_seed": deltas,
                 "mean": st["mean"],
                 "std": st["std"],
                 "stderr": st["std"] / float(np.sqrt(len(deltas))) if len(deltas) > 1 else 0.0,
-                "ci95_low": mean_ci95(deltas)[0],
-                "ci95_high": mean_ci95(deltas)[1],
+                "ci95_low": ci_low,
+                "ci95_high": ci_high,
                 "n_seeds": len(deltas),
             }
 

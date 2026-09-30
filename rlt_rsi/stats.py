@@ -14,22 +14,36 @@ _T_CRIT_95 = {
 }
 
 
+# Tabulated values above df=30. Each value applies from its own df upward until the next entry,
+# so between table rows the critical value is rounded up (a slightly wider, conservative interval)
+# rather than down.
+_T_CRIT_95_COARSE = ((120, 1.980), (60, 2.000), (40, 2.021))
+
+
 def t_critical_95(df: int) -> float:
-    """Two-sided 95% t critical value; normal approximation beyond df=30."""
+    """Two-sided 95% t critical value.
+
+    Exact (3 decimals) for df <= 30. For larger df the value of the nearest tabulated df at or
+    below ``df`` is used (never narrower than the true value), and 1.960 beyond df=1000.
+    """
     if df < 1:
         raise ValueError("degrees of freedom must be >= 1")
     if df in _T_CRIT_95:
         return _T_CRIT_95[df]
-    for limit, value in ((40, 2.021), (60, 2.000), (120, 1.980)):
-        if df <= limit:
+    if df >= 1000:
+        return 1.960
+    for limit, value in _T_CRIT_95_COARSE:
+        if df >= limit:
             return value
-    return 1.960
+    return _T_CRIT_95[30]
 
 
 def mean_ci95(values: Sequence[float]) -> Tuple[Optional[float], Optional[float]]:
     """95% t-interval for the mean of ``values``.
 
-    Returns ``(None, None)`` for fewer than two values, where no interval exists.
+    Returns ``(None, None)`` for fewer than two values, where no interval exists. With zero
+    sample variance (all values equal) the interval collapses to the mean; that reflects the
+    observed values only and is not evidence of zero uncertainty.
     """
     n = len(values)
     if n < 2:
