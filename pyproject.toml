@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "rlt-rsi-experiment"
-version = "0.1.0"
+version = "0.3.0"
 description = "A reproducible conventional-vs-looped transformer experiment on sequence parity"
 requires-python = ">=3.9"
 dependencies = ["numpy>=1.23"]

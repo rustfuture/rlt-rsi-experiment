@@ -69,6 +69,7 @@ There is **no silent fallback**; the requested and resolved devices are recorded
 - **Equal epoch counts are not equal compute budgets.** A `loop_count=k` configuration performs `k` block applications per optimisation step, so higher loop counts do more work per step. Compare the measured `seconds` column (hardware-specific).
 - **The ±5 percentage-point rule is an operational decision rule only.** It is not a statistical significance test, confidence interval, or equivalence test. Results are scoped to this run, task, seeds, and sample sizes.
 - **Paired per-seed deltas** (`paired_delta_vs_baseline`, with mean/std/stderr) are reported per configuration alongside aggregate means.
+- **Near-chance results.** In every committed run all configurations are near chance (held-out accuracy 0.464–0.521, held-out BCE about ln 2). H1/H2 verdicts in those reports compare numbers that are close to chance and are not evidence that the models learned parity or that looping helps.
 - **H1, H2 and H0 are operational rules.** H2 uses `drop = dev_accuracy(lengths 4–8) - heldout_accuracy(lengths 12–16)`, excluding training examples. A smaller gap can reflect worse dev performance, so it is exploratory and must be read alongside absolute accuracies. The corrected reference is [`results/torch-cpu-dev-reference/`](../results/torch-cpu-dev-reference/).
 - **Splits are example-disjoint by construction.** Train/dev are drawn as one joint pool of unique examples and randomly partitioned; held-out uses disjoint lengths and excludes train/dev examples. The overlap count per seed is recorded and asserted to be zero; `make_splits` raises rather than returning overlapping examples.
 - Because unique examples are required, the empirical length distribution deviates from uniform (the short-length example spaces are tiny); per-split `length_counts` are recorded in the split manifest.
@@ -81,7 +82,7 @@ There is **no silent fallback**; the requested and resolved devices are recorded
 | [`results/archive-v1/`](../results/archive-v1/) | Superseded v1 smoke output, retained as evidence |
 | [`results/torch-smoke/`](../results/torch-smoke/) | Tiny CPU torch smoke run (`--epochs 2`) |
 | [`results/torch-cpu-dev-reference/`](../results/torch-cpu-dev-reference/) | Corrected CPU torch reference (JSON + manifest + report) |
-| [`results/torch-mps-2026-09-15/`](../results/torch-mps-2026-09-15/) | Recorded MPS run discussed in the evaluation notes |
+| [`results/torch-mps-2026-09-15/`](../results/torch-mps-2026-09-15/) | Recorded MPS run. Its `in_distribution_accuracy` and H2 use the older pooled train+dev definition (see the dated note at the end of its `run.md`); all configurations are near chance |
 
 Checkpoint `.pt` files are small but **not portable** (machine/torch-build specific) and are gitignored under `results/*/checkpoints/`; only the JSON manifest with SHA-256 hashes is tracked. Regenerate them with the rerun command recorded in the manifest.
 

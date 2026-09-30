@@ -13,6 +13,10 @@ This project trains and compares computer models that reuse layers to classify w
 - Includes a bounded search that adjusts how many times a layer runs.
 - Offers a quick NumPy check and full PyTorch training.
 
+## What the committed results show
+
+**In the committed runs, no configuration learns parity.** In the recorded 80-epoch PyTorch runs ([MPS](results/torch-mps-2026-09-15/run.md), [CPU](results/torch-cpu-dev-reference/run.md)), mean held-out accuracy is 0.464-0.521 and mean train accuracy is 0.49-0.59 for every configuration, and held-out loss is about ln 2 (0.693), the loss of always predicting 0.5. Differences between the standard model and the looped models are differences between numbers near chance, with N=3 seeds and 128 held-out examples. The "improvement", "flat" and "regression" labels and the H1/H2 verdicts in those reports follow an operational rule and are not evidence that looping helps or that the models generalize to longer sequences. No RSI-adaptation result is committed yet: the adaptation code has tests, but no adaptation run output is stored under `results/`.
+
 ## Quick start
 
 ```bash
@@ -27,7 +31,7 @@ pytest -q
 # NumPy smoke pipeline (frozen features; fast CPU check)
 python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 --output results/smoke.json
 
-# Adaptation run (NumPy backend)
+# Adaptation run (NumPy backend); writes results/rsi_smoke.json, which is not committed
 python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 --rsi-generations 2 --rsi-epochs-per-gen 2 --output results/rsi_smoke.json
 
 # Optional: PyTorch end-to-end training (requires 'pip install -e .[torch]')
@@ -75,7 +79,9 @@ The NumPy CI job runs on Python 3.11; a separate job installs CPU PyTorch. Tests
 - Adaptation is a bounded heuristic over loop counts from 1–8, selected on validation data. It is not general Recursive Self-Improvement.
 - The ±0.05 held-out accuracy threshold across N=3 seeds is an operational rule, not a statistical significance test.
 - The NumPy and PyTorch backends use different architectures and parameter counts; see the [backend comparison](docs/reference.md#backend-architecture-comparison) and its [model test](tests/test_models.py) and [PyTorch test](tests/test_torch_training.py).
-- On repeated Apple Silicon MPS runs, looped-4 held-out accuracy moved from 0.5052 (`flat`) to 0.5208 (`improvement`) ([run details](results/torch-mps-2026-09-15/run.md)). Use `--device cpu` for bit-exact reproducibility.
+- Every committed configuration is near chance (see [What the committed results show](#what-the-committed-results-show)), so the H2 "supported" verdict for looped-2 in the [MPS run](results/torch-mps-2026-09-15/run.md) rests on differences around 0.47 and should not be read as evidence of better length generalization.
+- The MPS run's `in_distribution_accuracy` (and so H2) used pooled train+dev accuracy; the current code and the [CPU reference run](results/torch-cpu-dev-reference/run.md) use dev only. See the dated note at the end of the MPS run record.
+- Looped-4 held-out accuracy is 0.5052 (`flat`, paired delta +0.0417) in the committed [MPS run](results/torch-mps-2026-09-15/run.md) and 0.5208 (`improvement`, paired delta +0.0573) in the committed `--device cpu` run ([`results/torch-cpu-dev-reference`](results/torch-cpu-dev-reference/run.md)). The two runs have the same seeds and settings but different devices. No repeated run on either device is committed, and bit-exact reproducibility on `--device cpu` is unverified: no test or artifact checks it.
 - The hypotheses were specified before analysis, but are not described as preregistered because [`DESIGN.md`](DESIGN.md) and initial results were committed together (`161752a`).
 
 Checkpoint `.pt` files are machine-specific and gitignored; only JSON manifests with SHA-256 hashes are tracked. More interpretation rules and artifact details are in [the reference notes](docs/reference.md).
