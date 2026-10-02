@@ -34,10 +34,15 @@ python -m pip install -e '.[dev]'
 python -m pytest -q
 
 # NumPy smoke pipeline (frozen features; fast CPU check)
-python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 --output runs/quickstart/smoke.json
+python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 \
+    --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 \
+    --output runs/quickstart/smoke.json
 
 # Adaptation run (NumPy backend); writes a separate local run record
-python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 --rsi-generations 2 --rsi-epochs-per-gen 2 --output runs/quickstart/rsi_smoke.json
+python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
+    --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 \
+    --rsi-generations 2 --rsi-epochs-per-gen 2 \
+    --output runs/quickstart/rsi_smoke.json
 ```
 
 On Windows PowerShell, replace `python3` with `py -3` for environment creation and activate with `.\.venv\Scripts\Activate.ps1`; after activation use `python` for the remaining commands. If activation is restricted, call `.\.venv\Scripts\python.exe` directly; no policy change is required. See [the Python venv guide](https://docs.python.org/3/library/venv.html).
