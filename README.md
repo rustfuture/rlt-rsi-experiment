@@ -1,5 +1,7 @@
 # RLT-RSI Experiment
 
+![rlt-rsi-experiment project overview](docs/images/social-preview.png)
+
 This project trains and compares computer models that reuse layers to classify whether an on/off sequence contains an odd or even number of on values.
 
 [![CI](https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml)
