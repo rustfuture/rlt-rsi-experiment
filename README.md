@@ -19,24 +19,44 @@ This project trains and compares computer models that reuse layers to classify w
 
 ## Quick start
 
+You need Git and Python 3.9+ ([Python downloads](https://www.python.org/downloads/)). The NumPy path runs on CPU without model weights or an API key. Package installation needs network access.
+
 ```bash
-# Setup
+git clone https://github.com/rustfuture/rlt-rsi-experiment.git
+cd rlt-rsi-experiment
+
+# Setup (macOS/Linux Bash or zsh)
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[dev]'
+python -m pip install -e '.[dev]'
 
 # Run test suite
-pytest -q
+python -m pytest -q
 
 # NumPy smoke pipeline (frozen features; fast CPU check)
-python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 --output results/smoke.json
+python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 \
+    --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 \
+    --output runs/quickstart/smoke.json
 
-# Adaptation run (NumPy backend); writes results/rsi_smoke.json, which is not committed
-python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 --rsi-generations 2 --rsi-epochs-per-gen 2 --output results/rsi_smoke.json
+# Adaptation run (NumPy backend); writes a separate local run record
+python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
+    --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 \
+    --rsi-generations 2 --rsi-epochs-per-gen 2 \
+    --output runs/quickstart/rsi_smoke.json
+```
 
-# Optional: PyTorch end-to-end training (requires 'pip install -e .[torch]')
-python3 -m rlt_rsi.train --backend torch --device auto --seeds 7,42,123 --epochs 80 \
-    --artifacts-dir results/torch-run
+On Windows PowerShell, replace `python3` with `py -3` for environment creation and activate with `.\.venv\Scripts\Activate.ps1`; after activation use `python` for the remaining commands. If activation is restricted, call `.\.venv\Scripts\python.exe` directly; no policy change is required. See [the Python venv guide](https://docs.python.org/3/library/venv.html).
+
+Each training command prints a JSON summary and writes JSON plus a Markdown report under `runs/quickstart/`. This directory is gitignored, so the examples do not replace committed research results. A smoke run exercises the pipeline; it does not demonstrate learned parity.
+
+### Optional end-to-end training
+
+Install PyTorch separately before this longer run. Model and report artifacts stay under `runs/quickstart/`:
+
+```bash
+python -m pip install -e '.[torch]'
+python -m rlt_rsi.train --backend torch --device auto --seeds 7,42,123 --epochs 80 \
+    --artifacts-dir runs/quickstart/torch-run
 ```
 
 To run in a browser without local setup, open [`notebooks/rlt_rsi_colab.ipynb`](notebooks/rlt_rsi_colab.ipynb) in Google Colab.
