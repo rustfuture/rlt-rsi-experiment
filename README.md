@@ -6,8 +6,10 @@ This project trains and compares computer models that reuse layers to classify w
 
 [![CI](https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/rustfuture/rlt-rsi-experiment/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/rustfuture/rlt-rsi-experiment/blob/main/notebooks/rlt_rsi_colab.ipynb)
 
-**Status:** Experimental research prototype (v0.3.0).
+> [!NOTE]
+> **Status:** Experimental research prototype (v0.3.0).
 
 - Compares standard models with models that repeat the same layer 1, 2, or 4 times.
 - Checks whether models trained on short sequences work on longer ones.
@@ -117,6 +119,8 @@ Checkpoint `.pt` files are machine-specific and gitignored; only JSON manifests 
 
 ## Repository Map
 
+<details><summary>Repository map</summary>
+
 | Path | Contents |
 |---|---|
 | [`rlt_rsi/train.py`](rlt_rsi/train.py) | Baseline and looped training, backends, evaluation |
@@ -129,6 +133,8 @@ Checkpoint `.pt` files are machine-specific and gitignored; only JSON manifests 
 | [`results/`](results/) | Committed experiment artifacts |
 | [`notebooks/rlt_rsi_colab.ipynb`](notebooks/rlt_rsi_colab.ipynb) | CPU smoke and GPU walkthrough |
 | [`DESIGN.md`](DESIGN.md) | Architectural controls and research questions |
+
+</details>
 
 ## License
 
