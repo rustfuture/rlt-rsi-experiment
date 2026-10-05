@@ -34,13 +34,17 @@ python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 
-# Run test suite
-python -m pytest -q
-
 # NumPy smoke pipeline (frozen features; fast CPU check)
 python3 -m rlt_rsi.train --backend numpy --seeds 7,42,123 \
     --train-size 64 --dev-size 32 --heldout-size 32 --epochs 4 \
     --output runs/quickstart/smoke.json
+```
+
+### More commands
+
+```bash
+# Run test suite
+python -m pytest -q
 
 # Adaptation run (NumPy backend); writes a separate local run record
 python3 -m rlt_rsi.train_rsi --backend numpy --seeds 7,42,123 \
